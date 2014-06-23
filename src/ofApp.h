@@ -7,7 +7,7 @@
 #include "ofxKinect.h"
 #include "avatar.h"
 
-#define MAX_AVATARS 1
+#define MAX_AVATARS 3
 
 class ofApp : public ofBaseApp{
 
@@ -25,7 +25,8 @@ class ofApp : public ofBaseApp{
 		void windowResized(int w, int h);
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
-		
+        void exit();
+    
     
     
         /** Initializes frame recording. Creates new directory for saving frames. */
@@ -42,6 +43,10 @@ class ofApp : public ofBaseApp{
     
         /** Color image with background removed. */
         ofxCvColorImage colorImageMasked;
+        ofxCvGrayscaleImage grayBackgroundCapture;
+        bool bCaptureBg;
+    
+        ofImage colorImage;
     
         /** Grayscale image with depth image. */
         ofxCvGrayscaleImage depthImage;
@@ -49,7 +54,7 @@ class ofApp : public ofBaseApp{
         /** Thresholds for near and far limits. */
         int nearThreshold;
         int farThreshold;
-    
+        float angle;
     
     
         //----- Avatars -----//
@@ -60,6 +65,7 @@ class ofApp : public ofBaseApp{
         int currentAvatar;
     
         bool bRecordingAvatar;
+        bool bSavingRecords;
         ofxImageSequenceRecorder recorder;
 
     

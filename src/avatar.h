@@ -9,32 +9,34 @@
 #pragma once
 
 #include "ofMain.h"
-#include "ofxImageSequenceRecorder.h"
 #include "ofxImageSequencePlayer.h"
 
 class Avatar{
     
     public:
     
-    void setup();
-    void update();
-    void draw();
-    void addFrame(ofPixels imageToSave);
-    void setDirectory(string dir);
-    void startRecording();
-    void endRecording();
+        void setup();
+        void update();
+        void draw();
+        void setDirectory(string dir);
+        void startAvatar();
+        void resetAvatar();
+        
+        bool isPlaying(){ return bPlaying; }
+        
+        ofxImageSequencePlayer player;
+        ofFbo fbo;
+        ofPoint pos;
+        
+    private:
     
-    ofxImageSequenceRecorder recorder;
-    ofxImageSequencePlayer player;
+        string myDirectory;
+        bool bPlaying;
+        bool bPortrait;
+        ofImage image;
+        unsigned char * imagePix;
     
-    string myDirectory;
-    
-    bool bRecording;
-    bool bPlaying;
-    bool bDoneRecording;
-    
-    ofPoint pos;
-    
+
 };
 
 
