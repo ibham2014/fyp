@@ -44,8 +44,10 @@ void ofApp::setup(){
         avatars[i].pos.set(ofGetWidth()*.5,yp);//xp,ofGetHeight()*.5);
     }
     
+    bShowGui = true;
+    
     //--------- set application settings
-    ofSetFrameRate(60);
+    ofSetFrameRate(30);
     //ofSetVerticalSync(true);
     
 }
@@ -53,6 +55,9 @@ void ofApp::setup(){
 //--------------------------------------------------------------
 void ofApp::update(){
     
+    
+    if(bUseKinect){
+        
     //--------- update kinect
 	kinect.update();
     
@@ -112,6 +117,8 @@ void ofApp::update(){
         }
     }
     
+    }
+    
     //--------- update avatar players
     if(totalAvatarsThisUser > 0){
         for( int i = 0; i < totalAvatarsThisUser; i++){
@@ -123,7 +130,7 @@ void ofApp::update(){
 //--------------------------------------------------------------
 void ofApp::startRecording(){
     
-    cout << "totalAvatarsThisUser " << totalAvatarsThisUser << endl;
+    if(!bUseKinect) return;
     
     if(totalAvatarsThisUser >= MAX_AVATARS || bSavingRecords){
         bRecordingAvatar = false;
@@ -154,7 +161,8 @@ void ofApp::startRecording(){
 //--------------------------------------------------------------
 void ofApp::endRecording(){
     
-    cout << "end recording totalAvatarsThisUser " << totalAvatarsThisUser << endl;
+    if(!bUseKinect) return;
+    
     if(totalAvatarsThisUser >= MAX_AVATARS+1) return;
 
     cout << "end recording " << endl;
@@ -165,9 +173,8 @@ void ofApp::endRecording(){
 }
 
 void ofApp::exit(){
-    recorder.waitForThread();
-    kinect.close();
-
+    if(bUseKinect) recorder.waitForThread();
+    if(bUseKinect) kinect.close();
 }
 
 //--------------------------------------------------------------
@@ -175,15 +182,7 @@ void ofApp::draw(){
     
     ofBackground(0);
     
-    //--------- draw masked live color image
-    float xp = 160*2+20*2;//(ofGetWidth() - colorImageMasked.getWidth() ) *.5;
-    float yp = 20;//(ofGetHeight() - colorImageMasked.getHeight() ) *.5;
-    colorImageMasked.draw(xp,yp,160,120);
-    
-    //--------- draw preview
-    kinect.draw(20, 20, 160, 120);
-    kinect.drawDepth(40+160, 20, 160, 120);
-    
+
     
     ofSetColor(255, 255, 255);
     //--------- draw avatar
@@ -193,16 +192,31 @@ void ofApp::draw(){
         }
     }
     
-    ofSetColor(255, 255, 255);
-	stringstream reportStream;
-    reportStream << "set near threshold " << nearThreshold << " (press: + -)" << endl
-	<< "set far threshold " << farThreshold << ", fps: " << ofGetFrameRate() << endl;
-    stringstream c;
-    c << "Recording: " << bRecordingAvatar << "\nThread running: " << recorder.isThreadRunning() <<  "\nQueue Size: " << recorder.q.size() << "\n\nPress 'r' to toggle recording.\nPress 't' to toggle worker thread." << endl;
+    if(bShowGui){
+        
+        if(bUseKinect){
+            
+            //--------- draw masked live color image
+            float xp = 160*2+20*2;//(ofGetWidth() - colorImageMasked.getWidth() ) *.5;
+            float yp = 20;//(ofGetHeight() - colorImageMasked.getHeight() ) *.5;
+            colorImageMasked.draw(xp,yp,160,120);
+            
+            //--------- draw preview
+            kinect.draw(20, 20, 160, 120);
+            kinect.drawDepth(40+160, 20, 160, 120);
+            
+        }
+        
+        ofSetColor(255, 255, 255);
+        stringstream reportStream;
+        reportStream << "set near threshold " << nearThreshold << " (press: + -)" << endl
+        << "set far threshold " << farThreshold << ", fps: " << ofGetFrameRate() << endl;
+        stringstream c;
+        c << "Recording: " << bRecordingAvatar << "\nThread running: " << recorder.isThreadRunning() <<  "\nQueue Size: " << recorder.q.size() << "\n\nPress 'r' to toggle recording.\nPress 't' to toggle worker thread." << endl;
     
-    ofDrawBitmapString(reportStream.str(), 650, 10);
-    ofDrawBitmapString(c.str(), 650, 50);
-
+        ofDrawBitmapString(reportStream.str(), 650, 10);
+        ofDrawBitmapString(c.str(), 650, 50);
+    }
 }
 
 //--------------------------------------------------------------
@@ -242,13 +256,13 @@ void ofApp::keyPressed(int key){
         case OF_KEY_UP:
 			angle++;
 			if(angle>30) angle=30;
-			kinect.setCameraTiltAngle(angle);
+			if(bUseKinect) kinect.setCameraTiltAngle(angle);
 			break;
 			
 		case OF_KEY_DOWN:
 			angle--;
 			if(angle<-30) angle=-30;
-			kinect.setCameraTiltAngle(angle);
+			if(bUseKinect) kinect.setCameraTiltAngle(angle);
 			break;
         case 'x':
             for(int i = 0; i < MAX_AVATARS; i++){
@@ -258,7 +272,36 @@ void ofApp::keyPressed(int key){
             currentAvatar = -1;
             recorder.q.empty();
             break;
-        
+       case '1':
+            if(!bUseKinect){
+                avatars[0].setDirectory("avatar_2014-06-23-18-37-35-194");
+                avatars[0].startAvatar();
+                totalAvatarsThisUser=1;
+            }
+            break;
+        case '2':
+            if(!bUseKinect){
+                avatars[1].setDirectory("avatar_2014-06-23-18-36-38-356");
+                avatars[1].startAvatar();
+                totalAvatarsThisUser=2;
+                
+            }
+            break;
+        case '3':
+            if(!bUseKinect){
+                avatars[2].setDirectory("avatar_2014-06-23-18-36-23-113");
+                avatars[2].startAvatar();
+                totalAvatarsThisUser=3;
+                
+            }
+            break;
+        case 'f':
+            ofToggleFullscreen();
+            break;
+        case 'g':
+            bShowGui = !bShowGui;
+            break;
+            
     }
 
 }
