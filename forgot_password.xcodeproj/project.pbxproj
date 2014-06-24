@@ -33,6 +33,7 @@
 		7ADB04AF67C568EAFAEBA546 /* ofxKinectExtras.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 01438542609FC64F1EC60EEB /* ofxKinectExtras.cpp */; };
 		837220E80EB56CD44AD27F2A /* ofxSlider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 15F2C6477A769C03A56D1401 /* ofxSlider.cpp */; };
 		843DB2691957458700C1DFD8 /* avatar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 843DB2671957458700C1DFD8 /* avatar.cpp */; };
+		843DB27119597BF300C1DFD8 /* imageSequenceLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 843DB26F19597BF300C1DFD8 /* imageSequenceLoader.cpp */; };
 		856AA354D08AB4B323081444 /* ofxBaseGui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9604B925D32EE39065747725 /* ofxBaseGui.cpp */; };
 		879A251454401BC0B6E4F238 /* OscTypes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D9BFFBBF4CC43DEE890B3C3E /* OscTypes.cpp */; };
 		8F5205AEF8861EF234F0651A /* ofxOscSender.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 81967292BFC87A0144BD32C6 /* ofxOscSender.cpp */; };
@@ -194,6 +195,8 @@
 		83C70000C4AE60283CC77EB9 /* freenect_internal.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = freenect_internal.h; path = ../../../addons/ofxKinect/libs/libfreenect/src/freenect_internal.h; sourceTree = SOURCE_ROOT; };
 		843DB2671957458700C1DFD8 /* avatar.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = avatar.cpp; sourceTree = "<group>"; };
 		843DB2681957458700C1DFD8 /* avatar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = avatar.h; sourceTree = "<group>"; };
+		843DB26F19597BF300C1DFD8 /* imageSequenceLoader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = imageSequenceLoader.cpp; sourceTree = "<group>"; };
+		843DB27019597BF300C1DFD8 /* imageSequenceLoader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = imageSequenceLoader.h; sourceTree = "<group>"; };
 		8530EAD600CD792B81B2E79D /* legacy.hpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = legacy.hpp; path = ../../../addons/ofxOpenCv/libs/opencv/include/opencv2/legacy/legacy.hpp; sourceTree = SOURCE_ROOT; };
 		87F26B4B24CBD428AD9EEBAA /* ofxBaseGui.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ofxBaseGui.h; path = ../../../addons/ofxGui/src/ofxBaseGui.h; sourceTree = SOURCE_ROOT; };
 		89449E3044D456F7DE7BEA14 /* ofxPanel.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ofxPanel.h; path = ../../../addons/ofxGui/src/ofxPanel.h; sourceTree = SOURCE_ROOT; };
@@ -916,6 +919,8 @@
 		E4B69E1C0A3A1BDC003C02F2 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				843DB26F19597BF300C1DFD8 /* imageSequenceLoader.cpp */,
+				843DB27019597BF300C1DFD8 /* imageSequenceLoader.h */,
 				E4B69E1D0A3A1BDC003C02F2 /* main.cpp */,
 				E4B69E1E0A3A1BDC003C02F2 /* ofApp.cpp */,
 				E4B69E1F0A3A1BDC003C02F2 /* ofApp.h */,
@@ -1113,6 +1118,7 @@
 				B266578FC55D23BFEBC042E7 /* ofxGuiGroup.cpp in Sources */,
 				483908258D00B98B4BE69F07 /* ofxLabel.cpp in Sources */,
 				F285EB3169F1566CA3D93C20 /* ofxPanel.cpp in Sources */,
+				843DB27119597BF300C1DFD8 /* imageSequenceLoader.cpp in Sources */,
 				837220E80EB56CD44AD27F2A /* ofxSlider.cpp in Sources */,
 				B56FE57CC35806596D38118C /* ofxSliderGroup.cpp in Sources */,
 				1CD33E884D9E3358252E82A1 /* ofxToggle.cpp in Sources */,

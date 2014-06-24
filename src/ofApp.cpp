@@ -209,13 +209,22 @@ void ofApp::draw(){
         
         ofSetColor(255, 255, 255);
         stringstream reportStream;
-        reportStream << "set near threshold " << nearThreshold << " (press: + -)" << endl
-        << "set far threshold " << farThreshold << ", fps: " << ofGetFrameRate() << endl;
-        stringstream c;
-        c << "Recording: " << bRecordingAvatar << "\nThread running: " << recorder.isThreadRunning() <<  "\nQueue Size: " << recorder.q.size() << "\n\nPress 'r' to toggle recording.\nPress 't' to toggle worker thread." << endl;
+        if(bUseKinect){
+            
+            reportStream << "set near threshold " << nearThreshold << " (press: + -)" << endl
+            << "set far threshold " << farThreshold << endl << "fps: " << ofGetFrameRate() << endl <<
+            "r - toggle recording" << endl << "f - toggle fullscreen" <<  endl << "g - toggle gui " << endl
+            << "recording: " << bRecordingAvatar << endl;
+            /*stringstream c;
+            c << "Recording: " << bRecordingAvatar << "\nThread running: " << recorder.isThreadRunning() <<  "\nQueue Size: " << recorder.q.size() << "\n\nPress 'r' to toggle recording.\nPress 't' to toggle worker thread." << endl;
     
-        ofDrawBitmapString(reportStream.str(), 650, 10);
-        ofDrawBitmapString(c.str(), 650, 50);
+            ofDrawBitmapString(c.str(), 650, 50);*/
+        }else{
+            reportStream << "1,2,3 - Load prerecorded avatars.\n" << "g - toggle this text on/off\n"
+            << "f - toggle fullscreen\n" <<  "fps: " << ofGetFrameRate() << endl;
+            
+        }
+            ofDrawBitmapString(reportStream.str(), 650, 10);
     }
 }
 

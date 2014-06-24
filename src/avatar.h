@@ -10,6 +10,7 @@
 
 #include "ofMain.h"
 #include "ofxImageSequencePlayer.h"
+#include "imageSequenceLoader.h"
 
 class Avatar{
     
@@ -25,13 +26,16 @@ class Avatar{
         bool isPlaying(){ return bPlaying; }
         
         ofxImageSequencePlayer player;
-        ofFbo fbo;
         ofPoint pos;
+        imageSequenceLoader imageLoader;
+    
         
     private:
     
         string myDirectory;
         bool bPlaying;
+        bool bLoading;
+    
         bool bPortrait;
         ofImage image;
         unsigned char * imagePix;

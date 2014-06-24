@@ -12,18 +12,20 @@ void Avatar::setup(){
     
     bPlaying = false;
     bPortrait = false;
-    //pos.set(0,0);
-    fbo.allocate(640, 480,GL_RGBA);
     image.allocate(640,480,OF_IMAGE_COLOR_ALPHA);
     imagePix = new unsigned char[640*480*4];
     for(int i = 0; i < 640*480*4; i++){
         imagePix[i] = 0;
     }
+    
+    
 }
 
 void Avatar::resetAvatar(){
     
     bPlaying = false;
+    bLoading = false;
+    
     player.stop();
     player.close();
     myDirectory = "";
@@ -34,6 +36,19 @@ void Avatar::resetAvatar(){
 
 
 void Avatar::update(){
+    
+    if(bLoading){
+        if(imageLoader.isLoaded()){
+            bLoading = false;
+            player.loadMovie(imageLoader.images);
+            player.play();
+            bPlaying = true;
+            cout << "start playing avatar images" << endl;
+
+        }else{
+            imageLoader.update();
+        }
+    }
     
     if(bPlaying){
         player.update();
@@ -55,26 +70,40 @@ void Avatar::startAvatar(){
     
     if(myDirectory.length()==0) return;
     
-    cout << "start play" << endl;
-    player.loadMovie(myDirectory);//startThreadedLoading(myDirectory);
-    player.play();
-    bPlaying = true;
+    cout << "start loading avatar images" << endl;
+    
+    imageLoader.startLoading(myDirectory,true);
+    bLoading = true;
+    
+    
+    //player.loadMovie(myDirectory);//startThreadedLoading(myDirectory);
+    //player.play();
+    //bPlaying = true;
 }
 
 
 void Avatar::draw(){
     
-    
-    int totalLoaded = 0;
+    if(bPlaying){
+        ofSetRectMode(OF_RECTMODE_CENTER);
+        ofEnableAlphaBlending();
+        ofPushMatrix();
+            ofTranslate(pos.x,pos.y);
+            if(bPortrait) ofRotate(90);
+            player.drawImages();
+        ofPopMatrix();
+        ofSetRectMode(OF_RECTMODE_CORNER);
+    }
+   /* int totalLoaded = 0;
     for(int i = 0; i < player.images.size(); i++){
         if(player.images[player.getCurrentFrame()].getWidth() > 0){
             totalLoaded++;
-            cout << "curre image width " << player.images[player.getCurrentFrame()].getWidth()  << endl;
+            //cout << "curre image width " << player.images[player.getCurrentFrame()].getWidth()  << endl;
         }
-        else cout << "curre image width " << player.images[player.getCurrentFrame()].getWidth()  << endl;
+       // else cout << "curre image width " << player.images[player.getCurrentFrame()].getWidth()  << endl;
     }
     if(totalLoaded >= player.images.size() && totalLoaded > 0){
-        cout << "stop loader totalLoaded" << totalLoaded << endl;
+        //cout << "stop loader totalLoaded" << totalLoaded << endl;
     }else{
         return;
     }
@@ -132,6 +161,6 @@ void Avatar::draw(){
     
     ofSetRectMode(OF_RECTMODE_CORNER);
     //cout << "posx " << pos.x << " posy " << pos.y << endl;
-    
+    */
 
 }
