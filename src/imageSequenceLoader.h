@@ -17,6 +17,7 @@ class imageSequenceLoader{
         imageSequenceLoader();
         void startLoading( string directory, bool useConvertToAlpha = true );
         void update();
+        void reset();
     
         bool isLoaded(){ return allLoaded;}
         string getDirectory(){ return myDirectory; }

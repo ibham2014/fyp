@@ -38,18 +38,21 @@ void ofApp::setup(){
     bRecordingAvatar = false;
     bSavingRecords = false;
     recorder.setFormat("jpg");
+    avatarOffX = ofGetWidth()*.5+200;
+
     for(int i = 0; i < MAX_AVATARS; i++){
         avatars[i].setup();
         float yp = (i+1) * (ofGetHeight()/4.0);
-        avatars[i].pos.set(ofGetWidth()*.5,yp);//xp,ofGetHeight()*.5);
+        avatars[i].pos.set(avatarOffX,yp);//xp,ofGetHeight()*.5);
     }
     
-    bShowGui = true;
     
     //--------- set application settings
     ofSetFrameRate(30);
-    //ofSetVerticalSync(true);
     
+    //--------- gui
+    bShowGui = true;
+
 }
 
 //--------------------------------------------------------------
@@ -100,7 +103,6 @@ void ofApp::update(){
     // this is a hack to not have too many frames, should be frame rate based
     if(bRecordingAvatar && ofGetFrameNum() % 2 == 0){
         recorder.addFrame(colorImageMasked.getPixelsRef());
-        //cout << "add frame " << endl;
     }else if(bSavingRecords){
         
         if(recorder.q.size() == 0){
@@ -109,7 +111,6 @@ void ofApp::update(){
             // start new avatar
             if(!avatars[currentAvatar].isPlaying()){
                 cout << "start avatar" << endl;
-                //avatars[currentAvatar].pos.set( ofGetWidth()*.5,ofGetHeight()*.5 );
                 avatars[currentAvatar].startAvatar();
             }
         }else{
@@ -214,7 +215,7 @@ void ofApp::draw(){
             reportStream << "set near threshold " << nearThreshold << " (press: + -)" << endl
             << "set far threshold " << farThreshold << endl << "fps: " << ofGetFrameRate() << endl <<
             "r - toggle recording" << endl << "f - toggle fullscreen" <<  endl << "g - toggle gui " << endl
-            << "recording: " << bRecordingAvatar << endl;
+            << "x - clear all avatars" << endl << "recording: " << bRecordingAvatar << endl;
             /*stringstream c;
             c << "Recording: " << bRecordingAvatar << "\nThread running: " << recorder.isThreadRunning() <<  "\nQueue Size: " << recorder.q.size() << "\n\nPress 'r' to toggle recording.\nPress 't' to toggle worker thread." << endl;
     
@@ -228,6 +229,15 @@ void ofApp::draw(){
     }
 }
 
+//--------------------------------------------------------------
+void ofApp::setupGui(){
+    
+    // sliders for near and far planes of kinect
+    // sliders for box center, w,h,d
+    // toggle fullscreen
+    // show fps
+    
+}
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
     
@@ -273,6 +283,18 @@ void ofApp::keyPressed(int key){
 			if(angle<-30) angle=-30;
 			if(bUseKinect) kinect.setCameraTiltAngle(angle);
 			break;
+        case OF_KEY_LEFT:
+            avatarOffX+=5;
+            for( int i = 0; i < totalAvatarsThisUser; i++){
+                avatars[i].pos.x = avatarOffX;
+            }
+            break;
+        case OF_KEY_RIGHT:
+            avatarOffX-=5;
+            for( int i = 0; i < totalAvatarsThisUser; i++){
+                avatars[i].pos.x = avatarOffX;
+            }
+            break;
         case 'x':
             for(int i = 0; i < MAX_AVATARS; i++){
                 avatars[i].resetAvatar();

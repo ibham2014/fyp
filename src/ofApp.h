@@ -6,6 +6,7 @@
 #include "ofxOpenCv.h"
 #include "ofxKinect.h"
 #include "avatar.h"
+#include "ofxGui.h"
 
 #define MAX_AVATARS 3
 
@@ -35,6 +36,7 @@ class ofApp : public ofBaseApp{
         /** Stops frame recording. */
         void endRecording();
     
+        void setupGui();
     
         //----- Kinect ----//
     
@@ -67,6 +69,7 @@ class ofApp : public ofBaseApp{
         bool bRecordingAvatar;
         bool bSavingRecords;
         ofxImageSequenceRecorder recorder;
+        float avatarOffX;
 
     
         //----- Application Control -----//
@@ -80,5 +83,16 @@ class ofApp : public ofBaseApp{
     
         /** Toggles display of gui on and off. */
         bool bShowGui;
+        ofxPanel gui;
+        ofxIntSlider guiNearThreshold;
+        ofxIntSlider guiFarThreshold;
+        ofxIntSlider guiBoxCenter;
+        ofxIntSlider guiBoxWidth;
+        ofxIntSlider guiBoxHeight;
+        ofxIntSlider guiBoxDepth;
+        ofxToggle    guiFullScreen;
+        ofxToggle    guiShowBox;
+
+    
     
 };

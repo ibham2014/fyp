@@ -12,6 +12,14 @@ imageSequenceLoader::imageSequenceLoader(){
     
 }
 
+void imageSequenceLoader::reset(){
+    images.clear();
+    imageSequencePaths.clear();
+    bLoading = false;
+    allLoaded = false;
+    
+}
+
 void imageSequenceLoader::startLoading( string directory, bool useConvertToAlpha ){
     
     myDirectory = directory;

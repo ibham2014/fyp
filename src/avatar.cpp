@@ -32,6 +32,7 @@ void Avatar::resetAvatar(){
     for(int i = 0; i < 640*480*4; i++){
         imagePix[i] = 0;
     }
+    imageLoader.reset();
 }
 
 
@@ -90,6 +91,7 @@ void Avatar::draw(){
         ofPushMatrix();
             ofTranslate(pos.x,pos.y);
             if(bPortrait) ofRotate(90);
+            ofScale(1.5,1.5,1);
             player.drawImages();
         ofPopMatrix();
         ofSetRectMode(OF_RECTMODE_CORNER);
