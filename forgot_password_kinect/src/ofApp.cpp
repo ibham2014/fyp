@@ -3,8 +3,7 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-    
-    
+
     //--------- set up kinect
 	kinect.setRegistration(true); // enable depth->video image calibration
     
@@ -43,12 +42,14 @@ void ofApp::setup(){
     recorder.setup(640,480);
     recorder.setFormat("png");
 
+    
     for(int i = 0; i < MAX_AVATARS; i++){
         avatars[i].setup();
         float yp = (i+1) * (ofGetHeight()/4.0);
-        avatars[i].pos.set(avatarOffX,yp+avatarOffY);//xp,ofGetHeight()*.5);
+        avatars[i].pos.set(avatarOffX,yp+avatarOffY);
     }
-    
+ 
+
     
     //--------- set application settings
     ofSetFrameRate(30);

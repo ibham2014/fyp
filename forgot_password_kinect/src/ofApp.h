@@ -1,13 +1,13 @@
 #pragma once
 
 #include "ofMain.h"
-//#include "ofxImageSequenceRecorder.h"
-#include "imageSequenceRecorder.h"
+#include "ofxGui.h"
 #include "ofxImageSequencePlayer.h"
 #include "ofxOpenCv.h"
 #include "ofxKinect.h"
+#include "ofxXmlSettings.h"
+#include "imageSequenceRecorder.h"
 #include "avatar.h"
-#include "ofxGui.h"
 
 #define MAX_AVATARS 3
 
@@ -97,7 +97,9 @@ class ofApp : public ofBaseApp{
         ofxIntSlider guiBoxDepth;
         ofxToggle    guiFullScreen;
         ofxToggle    guiShowBox;
+    
 
+    
         // TODO
     /*
      - add osc
