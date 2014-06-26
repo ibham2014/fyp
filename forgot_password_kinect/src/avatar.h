@@ -22,7 +22,8 @@ class Avatar{
         void setDirectory(string dir);
         void startAvatar();
         void resetAvatar();
-        
+        void setUsePortrait(bool bPor){ bPortrait = bPor;}
+
         bool isPlaying(){ return bPlaying; }
         
         ofxImageSequencePlayer player;
