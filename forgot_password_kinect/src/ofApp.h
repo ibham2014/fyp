@@ -79,6 +79,7 @@ class ofApp : public ofBaseApp{
         /** Flag if we should capture background this frame. */
         bool bCaptureBg;
     
+        bool bHasDetectedUser;
     
         //----- Avatars -----//
         Avatar avatars[MAX_AVATARS];
@@ -104,21 +105,28 @@ class ofApp : public ofBaseApp{
     
         /** Toggles display of gui on and off. */
         bool bShowGui;
+        ofParameterGroup parameters;
+        ofParameterGroup kinectParameters;
+        ofParameterGroup avatarParameters;
+        ofParameterGroup userCheckParameters;
+
         ofxPanel gui;
-        ofxIntSlider guiXPos;
-        ofxIntSlider guiYPos;
-        ofxFloatSlider guiScale;
-        ofxIntSlider guiNearThreshold;
-        ofxIntSlider guiFarThreshold;
-        ofxIntSlider guiBoxCenter;
-        ofxIntSlider guiBoxWidth;
-        ofxIntSlider guiBoxHeight;
-        ofxIntSlider guiBoxDepth;
-        ofxIntSlider guiPresencePixels;
+        ofParameter<int> guiXPos;
+        ofParameter<int> guiYPos;
+        ofParameter<float> guiScale;
+        ofParameter<int> guiNearThreshold;
+        ofParameter<int> guiFarThreshold;
+        ofParameter<int> guiBoxCenterX;
+        ofParameter<int> guiBoxCenterY;
+        ofParameter<int> guiBoxCenterZ;
+        ofParameter<int> guiBoxWidth;
+        ofParameter<int> guiBoxHeight;
+        ofParameter<int> guiBoxDepth;
+        ofParameter<int> guiPresenceThreshold;
+        ofParameter<bool> guiUseCheckUser;
     
         //ofxToggle    guiFullScreen;
         //ofxToggle    guiShowBox;
-    
 
     
         // TODO

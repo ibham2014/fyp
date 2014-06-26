@@ -28,6 +28,7 @@ void ofApp::setup(){
     depthImage.allocate(width,height);
     grayBackgroundCapture.allocate(width,height);
     bCaptureBg = false;
+    bHasDetectedUser = false;
     
     //--------- set avatar
     totalAvatarsThisUser = 0;
@@ -215,8 +216,42 @@ void ofApp::endRecording(){
 //--------------------------------------------------------------
 void ofApp::checkForUser(){
     
-    // if using user check
-    // count pixels and check threshold
+    if(guiUseCheckUser && bUseKinect){
+        
+        if(kinect.isFrameNew()){
+            
+            ofPoint boxCenter = ofPoint(guiBoxCenterX,guiBoxCenterY,guiBoxCenterZ);
+            int depthPointsInBox = 0;
+            
+            int w = 640;
+            int h = 480;
+            
+            bHasDetectedUser = false;
+            
+            for( int x = 0; x < w; x++){
+                for( int y = 0; y < h; y++){
+                    
+                    ofPoint currentPoint = kinect.getWorldCoordinateAt(x, y);
+
+                    if (currentPoint.x > boxCenter.x - guiBoxWidth/2 && currentPoint.x < boxCenter.x + guiBoxWidth/2) {
+                        if (currentPoint.y > boxCenter.y - guiBoxHeight/2 && currentPoint.y < boxCenter.y + guiBoxHeight/2) {
+                            if (currentPoint.z > boxCenter.z - guiBoxDepth/2 && currentPoint.z < boxCenter.z + guiBoxDepth/2) {
+                                depthPointsInBox++;
+                            }
+                        }
+                    }
+                }
+
+            }
+            
+            
+            if( depthPointsInBox > guiPresenceThreshold){
+                //cout << "User detected." << endl;
+                bHasDetectedUser = true;
+            }
+        }
+            
+    }
     
 }
 
@@ -233,7 +268,7 @@ void ofApp::draw(){
         }
     }
     
-    
+    if(bShowGui){
         
         if(bUseKinect){
             
@@ -242,9 +277,16 @@ void ofApp::draw(){
             float yp = 20;
             
             //--------- draw preview
+            ofSetColor(255);
             kinect.draw(xp, 20, 160, 120);
             kinect.drawDepth(xp+160, 20, 160, 120);
-            colorImageMasked.draw(xp+160*2+20*2,yp,160,120);
+            colorImageMasked.draw(xp+160*2,yp,160,120);
+            
+            if(bHasDetectedUser){
+                ofNoFill();
+                ofSetColor(255,0,0);
+                ofRect(xp+160*2,yp,160,120);
+            }
         }
         
         ofSetColor(255, 255, 255);
@@ -257,8 +299,8 @@ void ofApp::draw(){
             reportStream << "1,2,3 - Load prerecorded avatars.\n" << "g - toggle this text on/off\n"
             << "f - toggle fullscreen\n" <<  "fps: " << ofGetFrameRate() << endl;
         }
-            ofDrawBitmapString(reportStream.str(), 10, 250);
-     if(bShowGui){
+            ofDrawBitmapString(reportStream.str(), 10, 450);
+    
         gui.draw();
     }
 }
@@ -282,16 +324,34 @@ void ofApp::openNextAvatarFromSaved(){
 //--------------------------------------------------------------
 void ofApp::setupGui(){
     
-    // sliders for box center, w,h,d
     // toggle fullscreen
     // show fps
+    parameters.setName("Settings");
     
-    gui.setup();
-	gui.add(guiXPos.setup("Avatar X Position",ofGetWidth()*.5+200,-1024,1024));
-	gui.add(guiYPos.setup( "Avatar Y Position", 0,-1024, 1024 ));
-    gui.add(guiScale.setup( "Avatar Scale", 1,.1, 3 ));
-    gui.add(guiNearThreshold.setup("Near Threshold",50,0,255));
-    gui.add(guiFarThreshold.setup("Far Threshold",160,0,255));
+    kinectParameters.setName("Kinect Settings");
+    kinectParameters.add(guiNearThreshold.set("Near Threshold",50,0,255));
+    kinectParameters.add(guiFarThreshold.set("Far Threshold",160,0,255));
+    
+    avatarParameters.setName("Avatar Settings");
+    avatarParameters.add(guiXPos.set("Avatar X Position",ofGetWidth()*.5+200,-1024,1024));
+	avatarParameters.add(guiYPos.set( "Avatar Y Position", 0,-1024, 1024 ));
+    avatarParameters.add(guiScale.set( "Avatar Scale", 1,.1, 3 ));
+    
+    userCheckParameters.setName("User Presense");
+    userCheckParameters.add(guiBoxCenterX.set("User Box X",-500,-2000,2000));
+    userCheckParameters.add(guiBoxCenterY.set("User Box Y",0,-2000,2000));
+    userCheckParameters.add(guiBoxCenterZ.set("User Box Z",2800,0,8000));
+    userCheckParameters.add(guiBoxWidth.set("User Box Width",800,0,2000));
+    userCheckParameters.add(guiBoxHeight.set("User Box Height",400,0,2000));
+    userCheckParameters.add(guiBoxDepth.set("User Box Depth",400,0,2000));
+    userCheckParameters.add(guiPresenceThreshold.set("User Pixel Thresh",1000,0,5000));
+    userCheckParameters.add(guiUseCheckUser.set("Use Presence",true));
+
+    parameters.add(kinectParameters);
+    parameters.add(avatarParameters);
+    parameters.add(userCheckParameters);
+
+    gui.setup(parameters);
 
 }
 //--------------------------------------------------------------

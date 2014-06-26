@@ -3,6 +3,41 @@
 	<Avatar_Y_Position>0</Avatar_Y_Position>
 	<Avatar_Scale>1</Avatar_Scale>
 <group/>
-<Near_Threshold>91</Near_Threshold>
-	<Far_Threshold>48</Far_Threshold>
+<Near_Threshold>140</Near_Threshold>
+	<Far_Threshold>0</Far_Threshold>
+<Avatar_Settings>
+		<Avatar_X_Position>712</Avatar_X_Position>
+		<Avatar_Y_Position>0</Avatar_Y_Position>
+		<Avatar_Scale>1</Avatar_Scale>
+	</Avatar_Settings>
+<Kinect_Settings>
+		<Near_Threshold>50</Near_Threshold>
+		<Far_Threshold>160</Far_Threshold>
+		<Avatar_Settings>
+			<Avatar_X_Position>712</Avatar_X_Position>
+			<Avatar_Y_Position>0</Avatar_Y_Position>
+			<Avatar_Scale>1</Avatar_Scale>
+		</Avatar_Settings>
+	</Kinect_Settings>
+<Settings>
+		<Kinect_Settings>
+			<Near_Threshold>50</Near_Threshold>
+			<Far_Threshold>160</Far_Threshold>
+		</Kinect_Settings>
+		<Avatar_Settings>
+			<Avatar_X_Position>712</Avatar_X_Position>
+			<Avatar_Y_Position>0</Avatar_Y_Position>
+			<Avatar_Scale>1</Avatar_Scale>
+		</Avatar_Settings>
+	<User_Presense>
+			<User_Box_X>-500</User_Box_X>
+			<User_Box_Y>0</User_Box_Y>
+			<User_Box_Z>2800</User_Box_Z>
+			<User_Box_Depth>400</User_Box_Depth>
+			<Use_Presence>1</Use_Presence>
+		<User_Box_Width>800</User_Box_Width>
+			<User_Box_Height>400</User_Box_Height>
+			<User_Pixel_Thresh>1000</User_Pixel_Thresh>
+		</User_Presense>
+	</Settings>
 </group>
