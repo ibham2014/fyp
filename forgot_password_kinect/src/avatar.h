@@ -9,7 +9,7 @@
 #pragma once
 
 #include "ofMain.h"
-#include "ofxImageSequencePlayer.h"
+#include "imageSequencePlayer.h"
 #include "imageSequenceLoader.h"
 
 class Avatar{
@@ -26,7 +26,7 @@ class Avatar{
 
         bool isPlaying(){ return bPlaying; }
         
-        ofxImageSequencePlayer player;
+        imageSequencePlayer player;
         ofPoint pos;
         imageSequenceLoader imageLoader;
         float drawScale;
