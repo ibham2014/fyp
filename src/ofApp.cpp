@@ -37,8 +37,10 @@ void ofApp::setup(){
     currentAvatar = -1;
     bRecordingAvatar = false;
     bSavingRecords = false;
-    recorder.setFormat("jpg");
     avatarOffX = ofGetWidth()*.5+200;
+
+    recorder.setup(640,480);
+    recorder.setFormat("png");
 
     for(int i = 0; i < MAX_AVATARS; i++){
         avatars[i].setup();
@@ -305,14 +307,16 @@ void ofApp::keyPressed(int key){
             break;
        case '1':
             if(!bUseKinect){
-                avatars[0].setDirectory("avatar_2014-06-23-18-37-35-194");
-                avatars[0].startAvatar();
-                totalAvatarsThisUser=1;
+                //string myDir = openFile();
+                
+                avatars[totalAvatarsThisUser].setDirectory("avatar_2014-06-23-18-36-38-356");
+                avatars[totalAvatarsThisUser].startAvatar();
+                totalAvatarsThisUser++;
             }
             break;
         case '2':
             if(!bUseKinect){
-                avatars[1].setDirectory("avatar_2014-06-23-18-36-38-356");
+                avatars[1].setDirectory("avatar_2014-06-23-18-37-35-194");
                 avatars[1].startAvatar();
                 totalAvatarsThisUser=2;
                 

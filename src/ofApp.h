@@ -1,7 +1,8 @@
 #pragma once
 
 #include "ofMain.h"
-#include "ofxImageSequenceRecorder.h"
+//#include "ofxImageSequenceRecorder.h"
+#include "imageSequenceRecorder.h"
 #include "ofxImageSequencePlayer.h"
 #include "ofxOpenCv.h"
 #include "ofxKinect.h"
@@ -37,7 +38,7 @@ class ofApp : public ofBaseApp{
         void endRecording();
     
         void setupGui();
-    
+        
         //----- Kinect ----//
     
         /** Kinect object. */
@@ -68,7 +69,7 @@ class ofApp : public ofBaseApp{
     
         bool bRecordingAvatar;
         bool bSavingRecords;
-        ofxImageSequenceRecorder recorder;
+        imageSequenceRecorder recorder;
         float avatarOffX;
 
     
@@ -93,6 +94,14 @@ class ofApp : public ofBaseApp{
         ofxToggle    guiFullScreen;
         ofxToggle    guiShowBox;
 
-    
+        // TODO
+    /*
+     - add osc
+     - check saving out png frames
+     - add kinect presence detection
+     - fade out avatars
+     - control timing of recording
+     - threaded loading
+     */
     
 };
