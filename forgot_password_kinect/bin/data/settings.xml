@@ -3,6 +3,6 @@
 	<Avatar_Y_Position>0</Avatar_Y_Position>
 	<Avatar_Scale>1</Avatar_Scale>
 <group/>
-<Near_Threshold>50</Near_Threshold>
-	<Far_Threshold>150</Far_Threshold>
+<Near_Threshold>91</Near_Threshold>
+	<Far_Threshold>48</Far_Threshold>
 </group>

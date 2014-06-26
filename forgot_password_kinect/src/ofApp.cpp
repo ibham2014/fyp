@@ -19,9 +19,6 @@ void ofApp::setup(){
         bUseKinect = true;
 	}
     
-    nearThreshold = 200;
-	farThreshold = 20;
-    angle = kinect.getTargetCameraTiltAngle();
     drawScale = 1;
     
     //--------- create image for holding masked rgb pixels
@@ -41,7 +38,7 @@ void ofApp::setup(){
     avatarOffY = 0;
     
     recorder.setup(640,480);
-    recorder.setFormat("png");
+    recorder.setFormat("jpg");
 
     
     for(int i = 0; i < MAX_AVATARS; i++){
@@ -64,31 +61,66 @@ void ofApp::setup(){
 
 
 }
-
+//--------------------------------------------------------------
+void ofApp::exit(){
+    gui.saveToFile("settings.xml");
+    if(bUseKinect) recorder.waitForThread();
+    if(bUseKinect) kinect.close();
+}
 //--------------------------------------------------------------
 void ofApp::update(){
     
     
     if(bUseKinect){
         
-    //--------- update kinect
-	kinect.update();
+        //--------- update kinect
+        kinect.update();
     
-    //--------- create masked rgb frame
+        //--------- process frame for background subtraction and thresholding by depth
+        processKinectFrame();
+    
+        //--------- check if user is present
+        checkForUser();
+        
+        //--------- update recording
+        updateRecording();
+    
+    }
+    
+    
+    
+    //--------- update avatar players
+    if(totalAvatarsThisUser > 0){
+        for( int i = 0; i < totalAvatarsThisUser; i++){
+            avatars[i].update();
+        }
+    }
+    
+    //-------- update vars not directly connected to gui
+    updateVarsFromGui();
+    
+}
+
+//--------------------------------------------------------------
+void ofApp::processKinectFrame(){
+    
     if(kinect.isFrameNew()) {
 		
 		depthImage.setFromPixels(kinect.getDepthPixels(), kinect.width, kinect.height);
 		colorImageMasked.setFromPixels(kinect.getPixelsRef());
+        
         if(bCaptureBg){
             grayBackgroundCapture.setFromPixels(kinect.getDepthPixels(), kinect.width, kinect.height);
             bCaptureBg = false;
         }
+        
         depthImage -= grayBackgroundCapture;
         depthImage.erode_3x3();
         depthImage.dilate_3x3();
         depthImage.dilate_3x3();
         depthImage.dilate_3x3();
         depthImage.blurGaussian();
+        
         unsigned char * pixG = depthImage.getPixels();
         unsigned char * pixC = colorImageMasked.getPixels();
         
@@ -103,58 +135,14 @@ void ofApp::update(){
                 pixC[i*3+2] = 0;
             }
         }
-    }
     
+    
+        
+    }
     colorImageMasked.flagImageChanged();
     depthImage.flagImageChanged();
-    
-    
-    //--------- update recording
-    // this is a hack to not have too many frames, should be frame rate based
-    if(bRecordingAvatar && ofGetFrameNum() % 2 == 0){
-        recorder.addFrame(colorImageMasked.getPixelsRef());
-    }else if(bSavingRecords){
-        
-        if(recorder.q.size() == 0){
-            bSavingRecords = false;
-            cout << "done saving frames" << endl;
-            // start new avatar
-            if(!avatars[currentAvatar].isPlaying()){
-                cout << "start avatar" << endl;
-                avatars[currentAvatar].startAvatar();
-            }
-        }else{
-            cout << " saving frames" << endl;
-        }
-    }
-    
-    }
-    
-    //--------- update avatar players
-    if(totalAvatarsThisUser > 0){
-        for( int i = 0; i < totalAvatarsThisUser; i++){
-            avatars[i].update();
-        }
-    }
-    
-    
-    if(guiScale != drawScale){
-        drawScale = guiScale;
-        for(int i = 0; i < MAX_AVATARS; i++) avatars[i].drawScale = drawScale;
-    }else if( guiXPos != avatarOffX){
-        avatarOffX = guiXPos;
-        for(int i = 0; i < MAX_AVATARS; i++){
-            avatars[i].pos.x = avatarOffX;
-        }
-    }else if( guiYPos != avatarOffY ){
-        avatarOffY = guiYPos;
-        for(int i = 0; i < MAX_AVATARS; i++){
-            float yp = (i+1) * (ofGetHeight()/4.0);
-            avatars[i].pos.y= yp+avatarOffY;
-        }
-    }
-    
 }
+
 //--------------------------------------------------------------
 void ofApp::startRecording(){
     
@@ -165,12 +153,10 @@ void ofApp::startRecording(){
         return;
     }
     
-    cout << "start recording " << endl;
+    cout << "Start recording." << endl;
     
     currentAvatar++;
     totalAvatarsThisUser++;
-
-    // ? reset avatar
     
     // set avatar directory
     string dir = "avatar_"+ofGetTimestampString();
@@ -184,8 +170,34 @@ void ofApp::startRecording(){
     // set is recording
     bRecordingAvatar = true;
     
-    
 }
+
+//--------------------------------------------------------------
+void ofApp::updateRecording(){
+    
+    if(bRecordingAvatar && ofGetFrameNum() % 2 == 0){
+        
+        recorder.addFrame(colorImageMasked.getPixelsRef());
+    
+    }else if(bSavingRecords){
+        
+        if(recorder.q.size() == 0){
+            
+            bSavingRecords = false;
+            cout << "Done saving frames." << endl;
+            
+            // start new avatar
+            if(!avatars[currentAvatar].isPlaying()){
+                cout << "Init avatar." << endl;
+                avatars[currentAvatar].startAvatar();
+            }
+            
+        }else{
+            //cout << " saving frames" << endl;
+        }
+    }
+}
+
 //--------------------------------------------------------------
 void ofApp::endRecording(){
     
@@ -200,34 +212,18 @@ void ofApp::endRecording(){
     
 }
 
-void ofApp::exit(){
-    gui.saveToFile("settings.xml");
-    if(bUseKinect) recorder.waitForThread();
-    if(bUseKinect) kinect.close();
-}
-
 //--------------------------------------------------------------
-void ofApp::openNextAvatarFromSaved(){
+void ofApp::checkForUser(){
     
-    if(totalAvatarsThisUser < MAX_AVATARS){
-        ofFileDialogResult openFileResult= ofSystemLoadDialog("Select a directory",true);
-        string path = openFileResult.getPath();
-        ofDirectory dirManager;
-        dirManager.open(path);
-        if( dirManager.isDirectory() ){
-            avatars[totalAvatarsThisUser].setDirectory(openFileResult.getName());
-            avatars[totalAvatarsThisUser].startAvatar();
-            totalAvatarsThisUser++;
-        }
-    }
+    // if using user check
+    // count pixels and check threshold
+    
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
     
     ofBackground(0);
-    
-
     
     ofSetColor(255, 255, 255);
     //--------- draw avatar
@@ -237,7 +233,7 @@ void ofApp::draw(){
         }
     }
     
-    if(bShowGui){
+    
         
         if(bUseKinect){
             
@@ -262,15 +258,30 @@ void ofApp::draw(){
             << "f - toggle fullscreen\n" <<  "fps: " << ofGetFrameRate() << endl;
         }
             ofDrawBitmapString(reportStream.str(), 10, 250);
-        
+     if(bShowGui){
         gui.draw();
+    }
+}
+
+//--------------------------------------------------------------
+void ofApp::openNextAvatarFromSaved(){
+    
+    if(totalAvatarsThisUser < MAX_AVATARS){
+        ofFileDialogResult openFileResult= ofSystemLoadDialog("Select a directory",true);
+        string path = openFileResult.getPath();
+        ofDirectory dirManager;
+        dirManager.open(path);
+        if( dirManager.isDirectory() ){
+            avatars[totalAvatarsThisUser].setDirectory(openFileResult.getName());
+            avatars[totalAvatarsThisUser].startAvatar();
+            totalAvatarsThisUser++;
+        }
     }
 }
 
 //--------------------------------------------------------------
 void ofApp::setupGui(){
     
-    // sliders for near and far planes of kinect
     // sliders for box center, w,h,d
     // toggle fullscreen
     // show fps
@@ -282,6 +293,25 @@ void ofApp::setupGui(){
     gui.add(guiNearThreshold.setup("Near Threshold",50,0,255));
     gui.add(guiFarThreshold.setup("Far Threshold",160,0,255));
 
+}
+//--------------------------------------------------------------
+void ofApp::updateVarsFromGui(){
+    
+    if(guiScale != drawScale){
+        drawScale = guiScale;
+        for(int i = 0; i < MAX_AVATARS; i++) avatars[i].drawScale = drawScale;
+    }else if( guiXPos != avatarOffX){
+        avatarOffX = guiXPos;
+        for(int i = 0; i < MAX_AVATARS; i++){
+            avatars[i].pos.x = avatarOffX;
+        }
+    }else if( guiYPos != avatarOffY ){
+        avatarOffY = guiYPos;
+        for(int i = 0; i < MAX_AVATARS; i++){
+            float yp = (i+1) * (ofGetHeight()/4.0);
+            avatars[i].pos.y= yp+avatarOffY;
+        }
+    }
 }
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
@@ -303,8 +333,8 @@ void ofApp::keyPressed(int key){
             break;
         case '>':
 		case '.':
-			farThreshold ++;
-			if (farThreshold > 255) farThreshold = 255;
+			//farThreshold ++;
+			//if (farThreshold > 255) farThreshold = 255;
 			break;
 		case OF_KEY_UP:
 			/*angle++;

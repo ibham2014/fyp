@@ -9,7 +9,7 @@
 #include "imageSequenceLoader.h"
 
 imageSequenceLoader::imageSequenceLoader(){
-    
+    bMirrored = false;
 }
 
 void imageSequenceLoader::reset(){
@@ -61,6 +61,7 @@ void imageSequenceLoader::update(){
         string nextToLoad = imageSequencePaths[images.size()];
         ofImage imageLoader;
         bool bLoaded = imageLoader.loadImage(nextToLoad);
+        if(bMirrored) imageLoader.mirror(false, true);
         
         // convert to alpha
         if(bMakeAlpha){

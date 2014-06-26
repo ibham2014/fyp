@@ -30,6 +30,7 @@ class ofApp : public ofBaseApp{
         void exit();
     
     
+        //---Recording controls
     
         /** Initializes frame recording. Creates new directory for saving frames. */
         void startRecording();
@@ -37,15 +38,30 @@ class ofApp : public ofBaseApp{
         /** Stops frame recording. */
         void endRecording();
     
-         /** Set up gui. */
+        /** Manages adding frames and stopping recording / start player when done saving. */
+        void updateRecording();
+    
+        //-- Kinect data processing
+    
+        /** Process the kinect frame to remove background, get threshold image */
+        void processKinectFrame();
+    
+        /** Check if a user is present by counting number of pixels inside a defined area in the scene */
+        void checkForUser();
+    
+        //--- Interface
+        /** Set up gui. */
         void setupGui();
+    
+        /** Update any variables that relate to gui but not used directly from gui. */
+        void updateVarsFromGui();
     
         /** Load an avatar an sequence of images from a directory*/
         void openNextAvatarFromSaved();
     
     
-        void loadSettingsFromXML();
     
+        
         //----- Kinect ----//
     
         /** Kinect object. */
@@ -53,18 +69,15 @@ class ofApp : public ofBaseApp{
     
         /** Color image with background removed. */
         ofxCvColorImage colorImageMasked;
-        ofxCvGrayscaleImage grayBackgroundCapture;
-        bool bCaptureBg;
-    
-        ofImage colorImage;
     
         /** Grayscale image with depth image. */
         ofxCvGrayscaleImage depthImage;
     
-        /** Thresholds for near and far limits. */
-        int nearThreshold;
-        int farThreshold;
-        float angle;
+        /** Grayscale image for background capture. */
+        ofxCvGrayscaleImage grayBackgroundCapture;
+
+        /** Flag if we should capture background this frame. */
+        bool bCaptureBg;
     
     
         //----- Avatars -----//
@@ -74,11 +87,11 @@ class ofApp : public ofBaseApp{
         int totalAvatarsThisUser;
         int currentAvatar;
     
-        bool bRecordingAvatar;
-        bool bSavingRecords;
         imageSequenceRecorder recorder;
         float avatarOffX,avatarOffY;
         float drawScale;
+        bool bRecordingAvatar;
+        bool bSavingRecords;
     
         //----- Application Control -----//
     
@@ -101,15 +114,16 @@ class ofApp : public ofBaseApp{
         ofxIntSlider guiBoxWidth;
         ofxIntSlider guiBoxHeight;
         ofxIntSlider guiBoxDepth;
-        ofxToggle    guiFullScreen;
-        ofxToggle    guiShowBox;
+        ofxIntSlider guiPresencePixels;
+    
+        //ofxToggle    guiFullScreen;
+        //ofxToggle    guiShowBox;
     
 
     
         // TODO
     /*
      - add osc
-     - check saving out png frames
      - add kinect presence detection
      - fade out avatars
      - control timing of recording

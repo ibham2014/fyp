@@ -5,6 +5,8 @@ void ofApp::setup(){
     avatar.setup();
     avatar.pos.set(ofGetWidth()*.5,ofGetHeight()*.5);
     avatar.setUsePortrait(true);
+    avatar.imageLoader.setMirrored(true);
+    
     bShowGui = true;
     bOpenFromFile = false;
     bPickRandom = false;
@@ -118,6 +120,9 @@ void ofApp::keyPressed(int key){
                 break;
             case '3':
                  avatar.player.setWaitTime(.1);
+                break;
+            case 'm':
+                avatar.imageLoader.toggleMirrored();
                 break;
             
     }

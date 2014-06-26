@@ -21,7 +21,9 @@ class imageSequenceLoader{
     
         bool isLoaded(){ return allLoaded;}
         string getDirectory(){ return myDirectory; }
-    
+        void setMirrored(bool bMirror){ bMirrored = bMirror;}
+        void toggleMirrored(){ bMirrored = !bMirrored;}
+
         vector<ofImage> images;
     
     private:
@@ -29,6 +31,7 @@ class imageSequenceLoader{
         bool bMakeAlpha;
         bool bLoading;
         bool allLoaded;
+        bool bMirrored;
     
         string myDirectory;
         vector<string> imageSequencePaths;
