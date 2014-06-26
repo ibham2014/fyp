@@ -28,8 +28,9 @@ class Avatar{
         ofxImageSequencePlayer player;
         ofPoint pos;
         imageSequenceLoader imageLoader;
+        float drawScale;
     
-        
+    
     private:
     
         string myDirectory;

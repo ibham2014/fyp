@@ -38,14 +38,15 @@ void ofApp::setup(){
     bRecordingAvatar = false;
     bSavingRecords = false;
     avatarOffX = ofGetWidth()*.5+200;
-
+    avatarOffY = 0;
+    
     recorder.setup(640,480);
     recorder.setFormat("png");
 
     for(int i = 0; i < MAX_AVATARS; i++){
         avatars[i].setup();
         float yp = (i+1) * (ofGetHeight()/4.0);
-        avatars[i].pos.set(avatarOffX,yp);//xp,ofGetHeight()*.5);
+        avatars[i].pos.set(avatarOffX,yp+avatarOffY);//xp,ofGetHeight()*.5);
     }
     
     
@@ -181,6 +182,22 @@ void ofApp::exit(){
 }
 
 //--------------------------------------------------------------
+void ofApp::openNextAvatarFromSaved(){
+    
+    if(totalAvatarsThisUser < MAX_AVATARS){
+        ofFileDialogResult openFileResult= ofSystemLoadDialog("Select a directory",true);
+        string path = openFileResult.getPath();
+        ofDirectory dirManager;
+        dirManager.open(path);
+        if( dirManager.isDirectory() ){
+            avatars[totalAvatarsThisUser].setDirectory(openFileResult.getName());
+            avatars[totalAvatarsThisUser].startAvatar();
+            totalAvatarsThisUser++;
+        }
+    }
+}
+
+//--------------------------------------------------------------
 void ofApp::draw(){
     
     ofBackground(0);
@@ -275,15 +292,24 @@ void ofApp::keyPressed(int key){
 			if (nearThreshold < 0) nearThreshold = 0;
 			break;
         case OF_KEY_UP:
-			angle++;
+			/*angle++;
 			if(angle>30) angle=30;
-			if(bUseKinect) kinect.setCameraTiltAngle(angle);
+			if(bUseKinect) kinect.setCameraTiltAngle(angle);*/
+            avatarOffY-=5;
+            for(int i = 0; i < MAX_AVATARS; i++){
+                float yp = (i+1) * (ofGetHeight()/4.0);
+                avatars[i].pos.set(avatarOffX,yp+avatarOffY);//xp,ofGetHeight()*.5);
+            }
 			break;
 			
 		case OF_KEY_DOWN:
-			angle--;
+			avatarOffY+=5;
+            for(int i = 0; i < MAX_AVATARS; i++){
+                float yp = (i+1) * (ofGetHeight()/4.0);
+                avatars[i].pos.set(avatarOffX,yp+avatarOffY);//xp,ofGetHeight()*.5);
+            }/*angle--;
 			if(angle<-30) angle=-30;
-			if(bUseKinect) kinect.setCameraTiltAngle(angle);
+			if(bUseKinect) kinect.setCameraTiltAngle(angle);*/
 			break;
         case OF_KEY_LEFT:
             avatarOffX+=5;
@@ -297,6 +323,14 @@ void ofApp::keyPressed(int key){
                 avatars[i].pos.x = avatarOffX;
             }
             break;
+        case 's':
+            drawScale-=.05;
+            for(int i = 0; i < MAX_AVATARS; i++) avatars[i].drawScale = drawScale;
+            break;
+        case 'S':
+            drawScale+=.05;
+            for(int i = 0; i < MAX_AVATARS; i++) avatars[i].drawScale = drawScale;
+            break;
         case 'x':
             for(int i = 0; i < MAX_AVATARS; i++){
                 avatars[i].resetAvatar();
@@ -306,29 +340,29 @@ void ofApp::keyPressed(int key){
             recorder.q.empty();
             break;
        case '1':
-            if(!bUseKinect){
-                //string myDir = openFile();
-                
+            if(!bUseKinect && totalAvatarsThisUser < MAX_AVATARS){
                 avatars[totalAvatarsThisUser].setDirectory("avatar_2014-06-23-18-36-38-356");
                 avatars[totalAvatarsThisUser].startAvatar();
                 totalAvatarsThisUser++;
             }
             break;
         case '2':
-            if(!bUseKinect){
-                avatars[1].setDirectory("avatar_2014-06-23-18-37-35-194");
-                avatars[1].startAvatar();
-                totalAvatarsThisUser=2;
+            if(!bUseKinect && totalAvatarsThisUser < MAX_AVATARS){
+                avatars[totalAvatarsThisUser].setDirectory("avatar_2014-06-23-18-37-35-194");
+                avatars[totalAvatarsThisUser].startAvatar();
+                totalAvatarsThisUser++;
                 
             }
             break;
         case '3':
-            if(!bUseKinect){
-                avatars[2].setDirectory("avatar_2014-06-23-18-36-23-113");
-                avatars[2].startAvatar();
-                totalAvatarsThisUser=3;
-                
+            if(!bUseKinect && totalAvatarsThisUser < MAX_AVATARS){
+                avatars[totalAvatarsThisUser].setDirectory("avatar_2014-06-23-18-36-23-113");
+                avatars[totalAvatarsThisUser].startAvatar();
+                totalAvatarsThisUser++;
             }
+            break;
+        case '0':
+            openNextAvatarFromSaved();
             break;
         case 'f':
             ofToggleFullscreen();

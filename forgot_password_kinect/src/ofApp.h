@@ -37,8 +37,12 @@ class ofApp : public ofBaseApp{
         /** Stops frame recording. */
         void endRecording();
     
+         /** Set up gui. */
         void setupGui();
-        
+    
+        /** Load an avatar an sequence of images from a directory*/
+        void openNextAvatarFromSaved();
+    
         //----- Kinect ----//
     
         /** Kinect object. */
@@ -70,8 +74,8 @@ class ofApp : public ofBaseApp{
         bool bRecordingAvatar;
         bool bSavingRecords;
         imageSequenceRecorder recorder;
-        float avatarOffX;
-
+        float avatarOffX,avatarOffY;
+        float drawScale;
     
         //----- Application Control -----//
     
