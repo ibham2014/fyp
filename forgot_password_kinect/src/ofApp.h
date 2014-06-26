@@ -43,6 +43,9 @@ class ofApp : public ofBaseApp{
         /** Load an avatar an sequence of images from a directory*/
         void openNextAvatarFromSaved();
     
+    
+        void loadSettingsFromXML();
+    
         //----- Kinect ----//
     
         /** Kinect object. */
@@ -89,6 +92,9 @@ class ofApp : public ofBaseApp{
         /** Toggles display of gui on and off. */
         bool bShowGui;
         ofxPanel gui;
+        ofxIntSlider guiXPos;
+        ofxIntSlider guiYPos;
+        ofxFloatSlider guiScale;
         ofxIntSlider guiNearThreshold;
         ofxIntSlider guiFarThreshold;
         ofxIntSlider guiBoxCenter;

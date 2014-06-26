@@ -22,6 +22,7 @@ void ofApp::setup(){
     nearThreshold = 200;
 	farThreshold = 20;
     angle = kinect.getTargetCameraTiltAngle();
+    drawScale = 1;
     
     //--------- create image for holding masked rgb pixels
     int width = 640;
@@ -55,7 +56,12 @@ void ofApp::setup(){
     ofSetFrameRate(30);
     
     //--------- gui
+    setupGui();
     bShowGui = true;
+    
+    //--------- settings
+    //xml.loadFile("settings.xml");
+
 
 }
 
@@ -88,7 +94,7 @@ void ofApp::update(){
         
         int numPixels = depthImage.getWidth() * depthImage.getHeight();
         for(int i = 0; i < numPixels; i++) {
-            if(pixG[i] < nearThreshold && pixG[i] > farThreshold) {
+            if(pixG[i] < guiNearThreshold && pixG[i] > guiFarThreshold) {
                 pixG[i] = 255;
             } else {
                 pixG[i] = 0;
@@ -128,6 +134,23 @@ void ofApp::update(){
     if(totalAvatarsThisUser > 0){
         for( int i = 0; i < totalAvatarsThisUser; i++){
             avatars[i].update();
+        }
+    }
+    
+    
+    if(guiScale != drawScale){
+        drawScale = guiScale;
+        for(int i = 0; i < MAX_AVATARS; i++) avatars[i].drawScale = drawScale;
+    }else if( guiXPos != avatarOffX){
+        avatarOffX = guiXPos;
+        for(int i = 0; i < MAX_AVATARS; i++){
+            avatars[i].pos.x = avatarOffX;
+        }
+    }else if( guiYPos != avatarOffY ){
+        avatarOffY = guiYPos;
+        for(int i = 0; i < MAX_AVATARS; i++){
+            float yp = (i+1) * (ofGetHeight()/4.0);
+            avatars[i].pos.y= yp+avatarOffY;
         }
     }
     
@@ -178,6 +201,7 @@ void ofApp::endRecording(){
 }
 
 void ofApp::exit(){
+    gui.saveToFile("settings.xml");
     if(bUseKinect) recorder.waitForThread();
     if(bUseKinect) kinect.close();
 }
@@ -218,34 +242,28 @@ void ofApp::draw(){
         if(bUseKinect){
             
             //--------- draw masked live color image
-            float xp = 160*2+20*2;//(ofGetWidth() - colorImageMasked.getWidth() ) *.5;
-            float yp = 20;//(ofGetHeight() - colorImageMasked.getHeight() ) *.5;
-            colorImageMasked.draw(xp,yp,160,120);
+            float xp = 400;
+            float yp = 20;
             
             //--------- draw preview
-            kinect.draw(20, 20, 160, 120);
-            kinect.drawDepth(40+160, 20, 160, 120);
-            
+            kinect.draw(xp, 20, 160, 120);
+            kinect.drawDepth(xp+160, 20, 160, 120);
+            colorImageMasked.draw(xp+160*2+20*2,yp,160,120);
         }
         
         ofSetColor(255, 255, 255);
         stringstream reportStream;
         if(bUseKinect){
-            
-            reportStream << "set near threshold " << nearThreshold << " (press: + -)" << endl
-            << "set far threshold " << farThreshold << endl << "fps: " << ofGetFrameRate() << endl <<
-            "r - toggle recording" << endl << "f - toggle fullscreen" <<  endl << "g - toggle gui " << endl
+            reportStream << "fps: " << ofGetFrameRate() << endl <<
+            "r - toggle recording" << endl << "f - toggle fullscreen" <<  endl << "g - toggle gui " << endl << "s - save settings" << endl
             << "x - clear all avatars" << endl << "recording: " << bRecordingAvatar << endl;
-            /*stringstream c;
-            c << "Recording: " << bRecordingAvatar << "\nThread running: " << recorder.isThreadRunning() <<  "\nQueue Size: " << recorder.q.size() << "\n\nPress 'r' to toggle recording.\nPress 't' to toggle worker thread." << endl;
-    
-            ofDrawBitmapString(c.str(), 650, 50);*/
         }else{
             reportStream << "1,2,3 - Load prerecorded avatars.\n" << "g - toggle this text on/off\n"
             << "f - toggle fullscreen\n" <<  "fps: " << ofGetFrameRate() << endl;
-            
         }
-            ofDrawBitmapString(reportStream.str(), 650, 10);
+            ofDrawBitmapString(reportStream.str(), 10, 250);
+        
+        gui.draw();
     }
 }
 
@@ -257,11 +275,24 @@ void ofApp::setupGui(){
     // toggle fullscreen
     // show fps
     
+    gui.setup();
+	gui.add(guiXPos.setup("Avatar X Position",ofGetWidth()*.5+200,-1024,1024));
+	gui.add(guiYPos.setup( "Avatar Y Position", 0,-1024, 1024 ));
+    gui.add(guiScale.setup( "Avatar Scale", 1,.1, 3 ));
+    gui.add(guiNearThreshold.setup("Near Threshold",50,0,255));
+    gui.add(guiFarThreshold.setup("Far Threshold",160,0,255));
+
 }
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
     
     switch(key){
+        case 'l':
+            gui.loadFromFile("settings.xml");
+            break;
+        case 's':
+            gui.saveToFile("settings.xml");
+            break;
         case 'b':
             bCaptureBg = !bCaptureBg;
             break;
@@ -275,31 +306,14 @@ void ofApp::keyPressed(int key){
 			farThreshold ++;
 			if (farThreshold > 255) farThreshold = 255;
 			break;
-			
-		case '<':
-		case ',':
-			farThreshold --;
-			if (farThreshold < 0) farThreshold = 0;
-			break;
-			
-		case '+':
-		case '=':
-			nearThreshold ++;
-			if (nearThreshold > 255) nearThreshold = 255;
-			break;
-			
-		case '-':
-			nearThreshold --;
-			if (nearThreshold < 0) nearThreshold = 0;
-			break;
-        case OF_KEY_UP:
+		case OF_KEY_UP:
 			/*angle++;
 			if(angle>30) angle=30;
 			if(bUseKinect) kinect.setCameraTiltAngle(angle);*/
             avatarOffY-=5;
             for(int i = 0; i < MAX_AVATARS; i++){
                 float yp = (i+1) * (ofGetHeight()/4.0);
-                avatars[i].pos.set(avatarOffX,yp+avatarOffY);//xp,ofGetHeight()*.5);
+                avatars[i].pos.set(avatarOffX,yp+avatarOffY);
             }
 			break;
 			
@@ -307,7 +321,7 @@ void ofApp::keyPressed(int key){
 			avatarOffY+=5;
             for(int i = 0; i < MAX_AVATARS; i++){
                 float yp = (i+1) * (ofGetHeight()/4.0);
-                avatars[i].pos.set(avatarOffX,yp+avatarOffY);//xp,ofGetHeight()*.5);
+                avatars[i].pos.set(avatarOffX,yp+avatarOffY);
             }/*angle--;
 			if(angle<-30) angle=-30;
 			if(bUseKinect) kinect.setCameraTiltAngle(angle);*/
@@ -323,14 +337,6 @@ void ofApp::keyPressed(int key){
             for( int i = 0; i < totalAvatarsThisUser; i++){
                 avatars[i].pos.x = avatarOffX;
             }
-            break;
-        case 's':
-            drawScale-=.05;
-            for(int i = 0; i < MAX_AVATARS; i++) avatars[i].drawScale = drawScale;
-            break;
-        case 'S':
-            drawScale+=.05;
-            for(int i = 0; i < MAX_AVATARS; i++) avatars[i].drawScale = drawScale;
             break;
         case 'x':
             for(int i = 0; i < MAX_AVATARS; i++){
@@ -388,7 +394,9 @@ void ofApp::mouseMoved(int x, int y ){
 
 //--------------------------------------------------------------
 void ofApp::mouseDragged(int x, int y, int button){
-
+    
+    cout << "avatarx " << avatarOffX << " gui x " << guiXPos << endl;
+    
 }
 
 //--------------------------------------------------------------
