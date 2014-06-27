@@ -3,6 +3,7 @@
 #include "ofMain.h"
 #include "avatar.h"
 #include "ofxXmlSettings.h"
+#include "ofxGui.h"
 
 #define USE_OSC
 
@@ -10,7 +11,7 @@
 #include "ofxOsc.h"
 #endif
 
-#define MAX_AVATARS 3
+#define MAX_AVATARS 2
 
 class ofApp : public ofBaseApp{
 
@@ -32,19 +33,33 @@ class ofApp : public ofBaseApp{
         void openAvatarFromSaved();
         void clearAvatar();
         void pickRandomAvatar();
+        void setToLoadSequence();
+        void loadNextAvatar();
+        void playNextAvatar();
+        void clearAllAvatars();
+        void playAndSendRecord();
+        void sendStopRecord();
+        void sendClearUser();
+        void setupGui();
     
         Avatar avatar;
         vector<string> avatarDirectories;
         Avatar avatars[MAX_AVATARS];
 
         int totalPreloaded; // total instructional avatars loaded so far
+        int currentPlaying;
     
         bool bOpenFromFile;
         bool bPickRandom;
         bool bLoadingNewSet; // is still loading avatars
         bool bReadyToStart; // is ready to begin insrtuctions
+        bool bUseSets;
+        bool bRecording;
     
         bool bShowGui;
+        ofxPanel gui;
+        ofTrueTypeFont font;
+    
 
 #ifdef USE_OSC
         ofxOscSender oscSender;

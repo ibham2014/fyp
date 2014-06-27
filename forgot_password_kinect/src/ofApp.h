@@ -9,7 +9,7 @@
 #include "imageSequenceRecorder.h"
 #include "avatar.h"
 
-#define MAX_AVATARS 3
+#define MAX_AVATARS 2
 
 class ofApp : public ofBaseApp{
 
@@ -62,6 +62,9 @@ class ofApp : public ofBaseApp{
         /** Send data via osc */
         void sendOscData();
     
+        /** Receive osc data */
+        void getOscData();
+    
         
         //----- Kinect ----//
     
@@ -101,6 +104,8 @@ class ofApp : public ofBaseApp{
         bool bUseKinect;
     
         ofxOscSender oscSender;
+        ofxOscReceiver oscReceiver;
+    
         string oscHost;
         int oscPort;    
     

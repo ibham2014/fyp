@@ -63,6 +63,7 @@ void ofApp::setup(){
     oscHost = xml.getValue("host", "localhost");
     oscPort = xml.getValue("port", 12345);
 	oscSender.setup(oscHost, oscPort);
+    oscReceiver.setup(oscPort);
 
 }
 //--------------------------------------------------------------
@@ -102,6 +103,7 @@ void ofApp::update(){
     
     //-------- send osc mesages
     sendOscData();
+    getOscData();
     
     //-------- update vars not directly connected to gui
     updateVarsFromGui();
@@ -269,7 +271,37 @@ void ofApp::sendOscData(){
     oscSender.sendMessage(m);
     
 }
+//--------------------------------------------------------------
+void ofApp::getOscData(){
+    while(oscReceiver.hasWaitingMessages()){
+        ofxOscMessage m;
+		oscReceiver.getNextMessage(&m);
+        if(m.getAddress() == "/fypRecord"){
+			int record = m.getArgAsInt32(0);
+            if(record == 1){
+                bRecordingAvatar = true;
+                startRecording();
+                cout << "start record from osc" << bRecordingAvatar << endl;
+            }else if( record == 0 ){
+                bRecordingAvatar = false;
+                endRecording();
+                cout << "stop record from osc" << bRecordingAvatar << endl;
 
+            }
+        }else if( m.getAddress() == "/fypNewUser"){
+            // clears for new user
+            for(int i = 0; i < MAX_AVATARS; i++){
+                avatars[i].resetAvatar();
+            }
+            totalAvatarsThisUser=0;
+            currentAvatar=-1;
+            recorder.q.empty();
+            bRecordingAvatar = false;
+            bSavingRecords = false;
+            if(recorder.isThreadRunning()) recorder.stopThread();
+        }
+    }
+}
 //--------------------------------------------------------------
 void ofApp::draw(){
     
@@ -302,6 +334,12 @@ void ofApp::draw(){
                 ofSetColor(255,0,0);
                 ofRect(xp+160*2,yp,160,120);
             }
+            
+            if(bRecordingAvatar){
+                ofNoFill();
+                ofSetColor(0,255,0);
+                ofRect(xp+160,yp,160,120);
+            }
         }
         
         ofSetColor(255, 255, 255);
@@ -332,6 +370,7 @@ void ofApp::openNextAvatarFromSaved(){
             avatars[totalAvatarsThisUser].setDirectory(openFileResult.getPath());
             avatars[totalAvatarsThisUser].startAvatar();
             totalAvatarsThisUser++;
+            currentAvatar++;
         }
     }
 }
@@ -445,16 +484,14 @@ void ofApp::keyPressed(int key){
             }
             break;
         case 'x':
-            if(totalAvatarsThisUser > 0){
+           if(totalAvatarsThisUser > 0){
                 cout << "current Avatar " << currentAvatar << " totalAvatar " << totalAvatarsThisUser << endl;
                 avatars[currentAvatar].resetAvatar();
-                //for(int i = 0; i < MAX_AVATARS; i++){
-                //    avatars[i].resetAvatar();
-                //}
                 totalAvatarsThisUser--;
                 currentAvatar--;
                 recorder.q.empty();
-            }
+           }
+            
             break;
         case '0':
             openNextAvatarFromSaved();

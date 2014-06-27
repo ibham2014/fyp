@@ -16,6 +16,7 @@ class Avatar{
     
     public:
     
+        Avatar();
         void setup();
         void update();
         void draw();
@@ -25,7 +26,16 @@ class Avatar{
         void setUsePortrait(bool bPor){ bPortrait = bPor;}
     
         bool isPlaying(){ return bPlaying; }
-        void togglePlaying(){ bPlaying = !bPlaying;}
+        bool isLoading(){ return bLoading; }
+        string getDirectory(){ return myDirectory; }
+        void togglePlaying(){
+            bool isFinished = player.getIsMovieDone();
+            player.togglePlaying();
+            if(player.isPlaying() && player.getLoopState() == OF_LOOP_NONE && isFinished){
+                player.firstFrame();
+                player.play();
+            }
+        }
     
         ofxImageSequencePlayer player;
         ofPoint pos;

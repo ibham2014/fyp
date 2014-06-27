@@ -2,14 +2,29 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
+    
     avatar.setup();
     avatar.pos.set(ofGetWidth()*.5,ofGetHeight()*.5);
     avatar.setUsePortrait(true);
     avatar.imageLoader.setMirrored(true);
     
+    for(int i = 0; i < MAX_AVATARS; i++){
+        avatars[i].setup();
+        avatars[i].pos.set(ofGetWidth()*.5,ofGetHeight()*.5);
+        avatars[i].setUsePortrait(true);
+        avatars[i].imageLoader.setMirrored(true);
+        avatars[i].player.setLoopState(OF_LOOP_NONE);
+        cout << avatars[i].getDirectory() << endl;
+    }
+    
     bShowGui = true;
     bOpenFromFile = false;
     bPickRandom = false;
+    bLoadingNewSet = false;
+    bUseSets = true;
+    bRecording = false;
+    totalPreloaded = 0;
+    currentPlaying = 0;
     
     // get list of directories
     ofDirectory dir("training_avatars");
@@ -31,7 +46,15 @@ void ofApp::setup(){
 //--------------------------------------------------------------
 void ofApp::update(){
     
-    if(bOpenFromFile){
+    if(bLoadingNewSet){
+        if(totalPreloaded >= MAX_AVATARS){
+            bLoadingNewSet = false;
+            avatars[0].player.setFrame(1);
+        }else{
+            loadNextAvatar();
+        }
+        
+    }else if(bOpenFromFile){
         bOpenFromFile = false;
         openAvatarFromSaved();
     
@@ -41,7 +64,19 @@ void ofApp::update(){
 
     }
     
-    avatar.update();
+    if(bUseSets){
+        for(int i = 0; i < totalPreloaded; i++)
+            avatars[i].update();
+        
+        if(avatars[currentPlaying].player.getIsMovieDone()){
+            if(bRecording){
+                bRecording = false;
+                sendStopRecord();
+            }
+        }
+    }else{
+     avatar.update();
+    }
     
     //--- osc controls
 #ifdef USE_OSC
@@ -57,20 +92,92 @@ void ofApp::draw(){
     ofBackground(0);
     
     ofSetColor(255, 255, 255);
-    avatar.draw();
+    if(bUseSets){
+        if(avatars[currentPlaying].player.getIsMovieDone())
+            ofSetColor(100,100,100);
+        avatars[currentPlaying].draw();
+    }else
+        avatar.draw();
     
     if(bShowGui){
         
-    ofSetColor(255, 255, 255);
-    stringstream reportStream;
-    reportStream << "0 - Load from file\n" << "g - toggle this text on/off\n"
-    << "f - toggle fullscreen\n" <<  "fps: " << ofGetFrameRate() << endl;
+        ofSetColor(255, 255, 255);
+        stringstream reportStream;
+        reportStream << "0 - Load from file\n" << "g - toggle this text on/off\n"
+        << "f - toggle fullscreen\n" <<  "fps: " << ofGetFrameRate() << endl << "RETURN - load sequence" << endl << "n - next sequence " << endl << "r - play and record" << endl;
     
-    ofDrawBitmapString(reportStream.str(), 650, 10);
+        ofDrawBitmapString(reportStream.str(), 650, 10);
+        
+        int totalLoaded = 0;
+        for(int i = 0; i < MAX_AVATARS; i++){
+            if(avatars[i].imageLoader.isLoaded()) totalLoaded++;
+        }
+        if( (bLoadingNewSet && totalPreloaded>=0) || totalLoaded < MAX_AVATARS){
+            
+            cout << totalPreloaded << endl;
+            stringstream reportStream2;
+            if(totalPreloaded > 0) reportStream2 << "Loading file: " << avatars[totalPreloaded-1].getDirectory() << endl;
+            ofDrawBitmapString(reportStream2.str(), 650, 200);
+        }
+    }
+}
+//--------------------------------------------------------------
+void ofApp::playAndSendRecord(){
+    
+    // send record message to app
+#ifdef USE_OSC
+    ofxOscMessage m;
+    m.setAddress("/fypRecord");
+    m.addIntArg(1);
+    oscSender.sendMessage(m);
+#endif
+    // start playing avatar
+    avatars[currentPlaying].player.setFrame(0);
+    avatars[currentPlaying].player.play();
+}
+//--------------------------------------------------------------
+void ofApp::sendStopRecord(){
+#ifdef USE_OSC
+    ofxOscMessage m;
+    m.setAddress("/fypRecord");
+    m.addIntArg(0);
+    oscSender.sendMessage(m);
+#endif
+}
+//--------------------------------------------------------------
+void ofApp::sendClearUser(){
+#ifdef USE_OSC
+    ofxOscMessage m;
+    m.setAddress("/fypNewUser");
+    oscSender.sendMessage(m);
+#endif
+}
+//--------------------------------------------------------------
+void ofApp::loadNextAvatar(){
+
+    if(avatarDirectories.size() > 0){
+        
+        if(totalPreloaded > 0){
+            if(avatars[totalPreloaded-1].isLoading()){
+                return;
+            }
+        }
+        int randomPick = ofRandom(0,avatarDirectories.size());
+        string dir = avatarDirectories[randomPick];
+        ofDirectory dirManager;
+        dirManager.open(dir);
+        if(dirManager.exists() && dirManager.isDirectory()){
+            avatars[totalPreloaded].setDirectory(dir);
+            avatars[totalPreloaded].startAvatar();
+            totalPreloaded++;
+        }
+        avatarDirectories.erase( avatarDirectories.begin() + randomPick );
+        cout << "load next " << endl;
     }
 }
 //--------------------------------------------------------------
 void ofApp::pickRandomAvatar(){
+
     if(avatarDirectories.size() > 0){
         clearAvatar();
         int randomPick = ofRandom(0,avatarDirectories.size());
@@ -104,12 +211,63 @@ void ofApp::openAvatarFromSaved(){
 void ofApp::clearAvatar(){
         avatar.resetAvatar();
 }
+void ofApp::clearAllAvatars(){
+    for(int i = 0; i < totalPreloaded; i++) avatars[i].resetAvatar();
+    totalPreloaded = 0;
+    currentPlaying = 0;
+    
+}
+//--------------------------------------------------------------
+void ofApp::playNextAvatar(){
+    if(currentPlaying == MAX_AVATARS-1){
+        currentPlaying = 0;
+    }else{
+        currentPlaying++;
+    }
+    avatars[currentPlaying].player.setFrame(0);
+
+}
+//--------------------------------------------------------------
+void ofApp::setToLoadSequence(){
+    ofDirectory dir("training_avatars");
+    int totalAvatars = dir.listDir();
+    for(int i=0; i<totalAvatars; i++) {
+        avatarDirectories.push_back(dir.getPath(i));
+    }
+    sendClearUser();
+    clearAllAvatars();
+    bLoadingNewSet = true;
+}
+//--------------------------------------------------------------
+void ofApp::setupGui(){
+    
+
+}
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
 
     switch(key){
+        case OF_KEY_UP:
+            for(int i = 0; i < MAX_AVATARS; i++)
+                avatars[i].drawScale+=.01;
+            break;
+        case OF_KEY_DOWN:
+            for(int i = 0; i < MAX_AVATARS; i++)
+                avatars[i].drawScale-=.01;
+            break;
+        case OF_KEY_RETURN:
+                setToLoadSequence();
+                break;
+            case 'r':
+                bRecording = true;
+                playAndSendRecord();
+                break;
+            case 'n':
+                playNextAvatar();
+                break;
             case 'p':
-                avatar.togglePlaying();
+                if(bUseSets) avatars[currentPlaying].togglePlaying();
+                //avatar.togglePlaying();
                 break;
             case '0':
                 bOpenFromFile = true;

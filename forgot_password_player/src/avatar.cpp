@@ -8,16 +8,22 @@
 
 #include "avatar.h"
 
+Avatar::Avatar(){
+    myDirectory = " ";
+    image.allocate(640,480,OF_IMAGE_COLOR_ALPHA);
+    imagePix = new unsigned char[640*480*4];
+
+}
+
 void Avatar::setup(){
     
     bPlaying = false;
     bPortrait = false;
-    image.allocate(640,480,OF_IMAGE_COLOR_ALPHA);
-    imagePix = new unsigned char[640*480*4];
     for(int i = 0; i < 640*480*4; i++){
         imagePix[i] = 0;
     }
-    drawScale = 1;
+    drawScale = 1.25;
+    myDirectory = " ";
     
 }
 
@@ -28,7 +34,7 @@ void Avatar::resetAvatar(){
     
     player.stop();
     player.close();
-    myDirectory = "";
+    myDirectory = " ";
     for(int i = 0; i < 640*480*4; i++){
         imagePix[i] = 0;
     }
@@ -42,7 +48,7 @@ void Avatar::update(){
         if(imageLoader.isLoaded()){
             bLoading = false;
             player.loadMovie(imageLoader.images);
-            player.play();
+            player.stop();
             bPlaying = true;
             cout << "start playing avatar images" << endl;
 
@@ -90,7 +96,7 @@ void Avatar::draw(){
         ofEnableAlphaBlending();
         ofPushMatrix();
             ofTranslate(pos.x,pos.y);
-            if(bPortrait) ofRotate(-90);
+            if(bPortrait) ofRotate(90);
             ofScale(drawScale,drawScale,1);
             player.drawImages();
         ofPopMatrix();

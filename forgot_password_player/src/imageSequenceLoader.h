@@ -23,7 +23,7 @@ class imageSequenceLoader{
         string getDirectory(){ return myDirectory; }
         void setMirrored(bool bMirror){ bMirrored = bMirror;}
         void toggleMirrored(){ bMirrored = !bMirrored;}
-
+        int getTotalLoaded(){ return images.size(); }
         vector<ofImage> images;
     
     private:
