@@ -35,6 +35,7 @@
 		843DB2691957458700C1DFD8 /* avatar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 843DB2671957458700C1DFD8 /* avatar.cpp */; };
 		843DB27119597BF300C1DFD8 /* imageSequenceLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 843DB26F19597BF300C1DFD8 /* imageSequenceLoader.cpp */; };
 		843DB279195AEF4D00C1DFD8 /* imageSequenceRecorder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 843DB277195AEF4D00C1DFD8 /* imageSequenceRecorder.cpp */; };
+		848EEAF1195DD9BC00E6B9CE /* ofxGLWarper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 848EEADB195DD9BC00E6B9CE /* ofxGLWarper.cpp */; };
 		84971C3C195CD5490073E5C5 /* imageSequencePlayer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 84971C3A195CD5490073E5C5 /* imageSequencePlayer.cpp */; };
 		856AA354D08AB4B323081444 /* ofxBaseGui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9604B925D32EE39065747725 /* ofxBaseGui.cpp */; };
 		879A251454401BC0B6E4F238 /* OscTypes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D9BFFBBF4CC43DEE890B3C3E /* OscTypes.cpp */; };
@@ -195,6 +196,8 @@
 		843DB27019597BF300C1DFD8 /* imageSequenceLoader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = imageSequenceLoader.h; sourceTree = "<group>"; };
 		843DB277195AEF4D00C1DFD8 /* imageSequenceRecorder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = imageSequenceRecorder.cpp; sourceTree = "<group>"; };
 		843DB278195AEF4D00C1DFD8 /* imageSequenceRecorder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = imageSequenceRecorder.h; sourceTree = "<group>"; };
+		848EEADB195DD9BC00E6B9CE /* ofxGLWarper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxGLWarper.cpp; sourceTree = "<group>"; };
+		848EEADC195DD9BC00E6B9CE /* ofxGLWarper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxGLWarper.h; sourceTree = "<group>"; };
 		84971C3A195CD5490073E5C5 /* imageSequencePlayer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = imageSequencePlayer.cpp; sourceTree = "<group>"; };
 		84971C3B195CD5490073E5C5 /* imageSequencePlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = imageSequencePlayer.h; sourceTree = "<group>"; };
 		8530EAD600CD792B81B2E79D /* legacy.hpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = legacy.hpp; path = ../../../addons/ofxOpenCv/libs/opencv/include/opencv2/legacy/legacy.hpp; sourceTree = SOURCE_ROOT; };
@@ -611,6 +614,24 @@
 			name = opencv;
 			sourceTree = "<group>";
 		};
+		848EEAB7195DD9BA00E6B9CE /* ofxGLWarper */ = {
+			isa = PBXGroup;
+			children = (
+				848EEADA195DD9BC00E6B9CE /* src */,
+			);
+			name = ofxGLWarper;
+			path = ../../../addons/ofxGLWarper;
+			sourceTree = "<group>";
+		};
+		848EEADA195DD9BC00E6B9CE /* src */ = {
+			isa = PBXGroup;
+			children = (
+				848EEADB195DD9BC00E6B9CE /* ofxGLWarper.cpp */,
+				848EEADC195DD9BC00E6B9CE /* ofxGLWarper.h */,
+			);
+			path = src;
+			sourceTree = "<group>";
+		};
 		86D2677079A3AF4A5A88E29A /* oscpack */ = {
 			isa = PBXGroup;
 			children = (
@@ -725,6 +746,7 @@
 		BB4B014C10F69532006C3DED /* addons */ = {
 			isa = PBXGroup;
 			children = (
+				848EEAB7195DD9BA00E6B9CE /* ofxGLWarper */,
 				480A780D8D0308AE4A368801 /* ofxGui */,
 				9683228C705CA3FF4F2EA945 /* ofxKinect */,
 				A0B90D3B0ADB9C1716816714 /* ofxOpenCv */,
@@ -1075,6 +1097,7 @@
 				7ADB04AF67C568EAFAEBA546 /* ofxKinectExtras.cpp in Sources */,
 				686B0DF6249B52E1A85B39EC /* ofxKinect.cpp in Sources */,
 				84971C3C195CD5490073E5C5 /* imageSequencePlayer.cpp in Sources */,
+				848EEAF1195DD9BC00E6B9CE /* ofxGLWarper.cpp in Sources */,
 				0F8F016776681D468C0D0949 /* audio.c in Sources */,
 				ACE7DC9A3223ED5EE1B80074 /* cameras.c in Sources */,
 				F4135EEFC911E9ED211FB6F9 /* core.c in Sources */,

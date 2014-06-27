@@ -64,6 +64,17 @@ void ofApp::setup(){
     oscPort = xml.getValue("port", 12345);
 	oscSender.setup(oscHost, oscPort);
     oscReceiver.setup(oscPort);
+    
+    
+    //---------
+    fbo.allocate(ofGetWidth(),ofGetHeight());
+    
+    fbo.begin();
+	ofClear(0,0,0);
+    fbo.end();
+    
+    warper.setup(ofGetWidth(),ofGetHeight());
+    warper.activate();
 
 }
 //--------------------------------------------------------------
@@ -306,14 +317,29 @@ void ofApp::getOscData(){
 void ofApp::draw(){
     
     ofBackground(0);
-    
     ofSetColor(255, 255, 255);
+    
     //--------- draw avatar
+    fbo.begin();
+    ofClear(0,0,0);
     if(totalAvatarsThisUser > 0){
         for( int i = 0; i < totalAvatarsThisUser; i++){
             avatars[i].draw();
         }
     }
+    fbo.end();
+    
+    
+    ofSetColor(255);
+
+    warper.begin();
+        fbo.draw(0,0);
+        if(bShowGui){
+            ofSetColor(255);
+            warper.draw();
+        }
+    warper.end();
+    
     
     if(bShowGui){
         
@@ -433,9 +459,11 @@ void ofApp::keyPressed(int key){
     switch(key){
         case 'l':
             gui.loadFromFile("settings.xml");
+            warper.load("warper.xml");
             break;
         case 's':
             gui.saveToFile("settings.xml");
+            warper.save("warper.xml");
             break;
         case 'b':
             bCaptureBg = !bCaptureBg;

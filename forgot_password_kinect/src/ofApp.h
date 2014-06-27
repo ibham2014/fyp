@@ -6,6 +6,7 @@
 #include "ofxKinect.h"
 #include "ofxXmlSettings.h"
 #include "ofxOsc.h"
+#include "ofxGLWarper.h"
 #include "imageSequenceRecorder.h"
 #include "avatar.h"
 
@@ -137,7 +138,10 @@ class ofApp : public ofBaseApp{
         //ofxToggle    guiFullScreen;
         //ofxToggle    guiShowBox;
 
-    
+        //---- FBO Warper
+        ofFbo fbo;
+        ofxGLWarper warper;
+
         // TODO
     /*
      - add osc
