@@ -21,7 +21,7 @@
 	</Kinect_Settings>
 <Settings>
 		<Kinect_Settings>
-			<Near_Threshold>50</Near_Threshold>
+			<Near_Threshold>255</Near_Threshold>
 			<Far_Threshold>160</Far_Threshold>
 		</Kinect_Settings>
 		<Avatar_Settings>

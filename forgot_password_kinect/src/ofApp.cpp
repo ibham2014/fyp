@@ -249,7 +249,6 @@ void ofApp::checkForUser(){
                 }
 
             }
-            cout << "depthPointsInBox detected." << depthPointsInBox << endl;
             if( depthPointsInBox > guiPresenceThreshold){
                 //cout << "User detected." << endl;
                 bHasDetectedUser = true;
@@ -406,6 +405,7 @@ void ofApp::keyPressed(int key){
             bRecordingAvatar = !bRecordingAvatar;
             if(bRecordingAvatar) startRecording();
             else endRecording();
+            cout << "change record " << bRecordingAvatar << endl;
             break;
         case '>':
 		case '.':
@@ -445,12 +445,16 @@ void ofApp::keyPressed(int key){
             }
             break;
         case 'x':
-            for(int i = 0; i < MAX_AVATARS; i++){
-                avatars[i].resetAvatar();
+            if(totalAvatarsThisUser > 0){
+                cout << "current Avatar " << currentAvatar << " totalAvatar " << totalAvatarsThisUser << endl;
+                avatars[currentAvatar].resetAvatar();
+                //for(int i = 0; i < MAX_AVATARS; i++){
+                //    avatars[i].resetAvatar();
+                //}
+                totalAvatarsThisUser--;
+                currentAvatar--;
+                recorder.q.empty();
             }
-            totalAvatarsThisUser = 0;
-            currentAvatar = -1;
-            recorder.q.empty();
             break;
         case '0':
             openNextAvatarFromSaved();

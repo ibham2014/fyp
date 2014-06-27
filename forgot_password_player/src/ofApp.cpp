@@ -17,6 +17,14 @@ void ofApp::setup(){
     for(int i=0; i<totalAvatars; i++) {
         avatarDirectories.push_back(dir.getPath(i));
     }
+    
+#ifdef USE_OSC
+    ofxXmlSettings xml;
+    xml.load("oscSettings.xml");
+    oscHost = xml.getValue("host", "localhost");
+    oscPort = xml.getValue("port", 12345);
+	oscSender.setup(oscHost, oscPort);
+#endif
 
 }
 
@@ -26,15 +34,21 @@ void ofApp::update(){
     if(bOpenFromFile){
         bOpenFromFile = false;
         openAvatarFromSaved();
-    }
     
-    if(bPickRandom){
+    }else if(bPickRandom){
         bPickRandom = false;
         pickRandomAvatar();
 
     }
     
     avatar.update();
+    
+    //--- osc controls
+#ifdef USE_OSC
+    // send and receive osc
+    // if 
+#endif
+  
 }
 
 //--------------------------------------------------------------
