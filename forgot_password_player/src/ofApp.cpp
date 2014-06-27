@@ -197,6 +197,8 @@ void ofApp::loadNextAvatar(){
         }
         int randomPick = ofRandom(0,avatarDirectories.size());
         string dir = avatarDirectories[randomPick];
+        cout << "rand pick " << randomPick << endl;
+        
         ofDirectory dirManager;
         dirManager.open(dir);
         if(dirManager.exists() && dirManager.isDirectory()){
@@ -264,6 +266,7 @@ void ofApp::playNextAvatar(){
 void ofApp::setToLoadSequence(){
     ofDirectory dir("training_avatars");
     int totalAvatars = dir.listDir();
+    avatarDirectories.clear();
     for(int i=0; i<totalAvatars; i++) {
         avatarDirectories.push_back(dir.getPath(i));
     }
