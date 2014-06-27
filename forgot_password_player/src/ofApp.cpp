@@ -40,6 +40,11 @@ void ofApp::setup(){
     oscPort = xml.getValue("port", 12345);
 	oscSender.setup(oscHost, oscPort);
 #endif
+    
+    // fonts
+    font.loadFont("frabk.ttf", 30, true, true);
+	font.setLineHeight(34.0f);
+	font.setLetterSpacing(1.035);
 
 }
 
@@ -91,14 +96,46 @@ void ofApp::draw(){
     
     ofBackground(0);
     
+    int totalLoaded = 0;
+    for(int i = 0; i < MAX_AVATARS; i++){
+        if(avatars[i].imageLoader.isLoaded()) totalLoaded++;
+    }
+    
     ofSetColor(255, 255, 255);
     if(bUseSets){
+        
         if(avatars[currentPlaying].player.getIsMovieDone())
-            ofSetColor(100,100,100);
-        avatars[currentPlaying].draw();
+            ofSetColor(150,150,150);
+        
+        // only show if all loaded
+        if(totalLoaded >= MAX_AVATARS) avatars[currentPlaying].draw();
+    
     }else
         avatar.draw();
     
+    //---
+    // show instructions
+    if(bUseSets){
+        ofSetColor(255, 255, 255);
+        if(totalLoaded < MAX_AVATARS){
+            string readyInfo = "Please Wait";
+            ofRectangle bounds = font.getStringBoundingBox(readyInfo, 0, 0);
+            font.drawString(readyInfo, ofGetWidth()*.5-bounds.width*.5, ofGetHeight()*.85-bounds.height*.5);
+        }else if( !avatars[currentPlaying].player.isPlaying() && !avatars[currentPlaying].player.getIsMovieDone()){
+            string readyInfo = "When the video begins,";
+            ofRectangle bounds = font.getStringBoundingBox(readyInfo, 0, 0);
+            font.drawString(readyInfo, ofGetWidth()*.5-bounds.width*.5, ofGetHeight()*.85-bounds.height*.5);
+            readyInfo = "follow the dance movements";
+            ofRectangle bounds2 = font.getStringBoundingBox(readyInfo, 0, 0);
+            font.drawString(readyInfo, ofGetWidth()*.5-bounds2.width*.5, ofGetHeight()*.85-bounds2.height*.5+bounds.height);
+        }else if( avatars[currentPlaying].player.getIsMovieDone() ){
+            string readyInfo = "Wait a moment for your avatar to generate.";
+            ofRectangle bounds = font.getStringBoundingBox(readyInfo, 0, 0);
+            font.drawString(readyInfo, ofGetWidth()*.5-bounds.width*.5, ofGetHeight()*.85-bounds.height*.5);
+        }
+    }
+    
+    //-----
     if(bShowGui){
         
         ofSetColor(255, 255, 255);
@@ -108,10 +145,6 @@ void ofApp::draw(){
     
         ofDrawBitmapString(reportStream.str(), 650, 10);
         
-        int totalLoaded = 0;
-        for(int i = 0; i < MAX_AVATARS; i++){
-            if(avatars[i].imageLoader.isLoaded()) totalLoaded++;
-        }
         if( (bLoadingNewSet && totalPreloaded>=0) || totalLoaded < MAX_AVATARS){
             
             cout << totalPreloaded << endl;
