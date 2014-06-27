@@ -36,7 +36,6 @@ class imageSequencePlayer: public ofBaseVideoPlayer {
         void play();
         void stop();
         
-        //ofxThreadedImageLoader loader;
         vector<ofImage> images;
         
         bool isFrameNew();
@@ -74,7 +73,8 @@ class imageSequencePlayer: public ofBaseVideoPlayer {
         void previousFrame();
         
         void setWaitTime(float time){ waitTime = time; }
-        
+        void togglePlaying(){ bPlaying = !bPlaying;}
+
     protected:
         
         vector<string> imageSequencePaths;
