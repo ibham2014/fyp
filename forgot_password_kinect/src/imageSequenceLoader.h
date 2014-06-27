@@ -23,6 +23,8 @@ class imageSequenceLoader{
         string getDirectory(){ return myDirectory; }
     
         vector<ofImage> images;
+        int blackThreshold;
+    
     
     private:
         int totalToLoad;

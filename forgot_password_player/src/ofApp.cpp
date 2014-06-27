@@ -39,12 +39,19 @@ void ofApp::setup(){
     oscHost = xml.getValue("host", "localhost");
     oscPort = xml.getValue("port", 12345);
 	oscSender.setup(oscHost, oscPort);
+    oscReceiver.setup(oscPort);
 #endif
     
     // fonts
     font.loadFont("frabk.ttf", 30, true, true);
 	font.setLineHeight(34.0f);
 	font.setLetterSpacing(1.035);
+    
+    bHasUser = false;
+    lastUserTime = 0;
+    userTimeThreshold = 1;
+    
+    setupGui();
 
 }
 
@@ -54,7 +61,7 @@ void ofApp::update(){
     if(bLoadingNewSet){
         if(totalPreloaded >= MAX_AVATARS){
             bLoadingNewSet = false;
-            avatars[0].player.setFrame(1);
+            avatars[0].player.setFrame(0);
         }else{
             loadNextAvatar();
         }
@@ -86,8 +93,17 @@ void ofApp::update(){
     //--- osc controls
 #ifdef USE_OSC
     // send and receive osc
-    // if 
+    getOscData();
+    if(bHasUser){
+        float nowTime = ofGetElapsedTimef();
+        if(nowTime-lastUserTime > userTimeThreshold){
+            bHasUser = false;
+        }
+    }
 #endif
+    
+    //
+    updateVarsFromGui();
   
 }
 
@@ -98,7 +114,7 @@ void ofApp::draw(){
     
     int totalLoaded = 0;
     for(int i = 0; i < MAX_AVATARS; i++){
-        if(avatars[i].imageLoader.isLoaded()) totalLoaded++;
+        if(avatars[i].player.isLoaded()) totalLoaded++;
     }
     
     ofSetColor(255, 255, 255);
@@ -109,7 +125,8 @@ void ofApp::draw(){
         
         // only show if all loaded
         if(totalLoaded >= MAX_AVATARS) avatars[currentPlaying].draw();
-    
+        
+        //cout << "totalLoaded " << totalLoaded << endl;
     }else
         avatar.draw();
     
@@ -124,10 +141,10 @@ void ofApp::draw(){
         }else if( !avatars[currentPlaying].player.isPlaying() && !avatars[currentPlaying].player.getIsMovieDone()){
             string readyInfo = "When the video begins,";
             ofRectangle bounds = font.getStringBoundingBox(readyInfo, 0, 0);
-            font.drawString(readyInfo, ofGetWidth()*.5-bounds.width*.5, ofGetHeight()*.85-bounds.height*.5);
+            font.drawString(readyInfo, ofGetWidth()*.5-bounds.width*.5, ofGetHeight()*.20-bounds.height*.5);
             readyInfo = "follow the dance movements";
             ofRectangle bounds2 = font.getStringBoundingBox(readyInfo, 0, 0);
-            font.drawString(readyInfo, ofGetWidth()*.5-bounds2.width*.5, ofGetHeight()*.85-bounds2.height*.5+bounds.height);
+            font.drawString(readyInfo, ofGetWidth()*.5-bounds2.width*.5, ofGetHeight()*.20-bounds2.height*.5+bounds.height);
         }else if( avatars[currentPlaying].player.getIsMovieDone() ){
             string readyInfo = "Wait a moment for your avatar to generate.";
             ofRectangle bounds = font.getStringBoundingBox(readyInfo, 0, 0);
@@ -143,14 +160,38 @@ void ofApp::draw(){
         reportStream << "0 - Load from file\n" << "g - toggle this text on/off\n"
         << "f - toggle fullscreen\n" <<  "fps: " << ofGetFrameRate() << endl << "RETURN - load sequence" << endl << "n - next sequence " << endl << "r - play and record" << endl;
     
-        ofDrawBitmapString(reportStream.str(), 650, 10);
+        ofDrawBitmapString(reportStream.str(), ofGetWidth()-200, 10);
         
         if( (bLoadingNewSet && totalPreloaded>=0) || totalLoaded < MAX_AVATARS){
             
-            cout << totalPreloaded << endl;
+            //cout << totalPreloaded << endl;
             stringstream reportStream2;
             if(totalPreloaded > 0) reportStream2 << "Loading file: " << avatars[totalPreloaded-1].getDirectory() << endl;
-            ofDrawBitmapString(reportStream2.str(), 650, 200);
+            ofDrawBitmapString(reportStream2.str(), ofGetWidth()-200, 120);
+        }
+        
+        gui.draw();
+    }
+    
+    if(bHasUser){
+        ofNoFill();
+        ofSetColor(255, 0, 0);
+        ofSetLineWidth(3);
+        ofRect(0, 0, ofGetWidth(), ofGetHeight());
+        ofSetLineWidth(1);
+    }
+}
+//--------------------------------------------------------------
+void ofApp::getOscData(){
+    while(oscReceiver.hasWaitingMessages()){
+        ofxOscMessage m;
+		oscReceiver.getNextMessage(&m);
+        if(m.getAddress() == "/hasUser"){
+            int hasUser = m.getArgAsInt32(0);
+            if(hasUser == 1 ){
+                bHasUser = true;
+                lastUserTime = ofGetElapsedTimef();
+            }
         }
     }
 }
@@ -277,7 +318,25 @@ void ofApp::setToLoadSequence(){
 //--------------------------------------------------------------
 void ofApp::setupGui(){
     
-
+    parameters.setName("Settings");
+    
+    movieParameters.setName("Movie Settings");
+    movieParameters.add(guiXPos.set("Avatar X Position",ofGetWidth()*.5,-1024,1024));
+	movieParameters.add(guiYPos.set( "Avatar Y Position", ofGetHeight()*.5,-1024, 1024 ));
+    movieParameters.add(guiScale.set( "Avatar Scale", 1,.1, 3 ));
+    
+    parameters.add(movieParameters);
+    
+    gui.setup(parameters);
+}
+//--------------------------------------------------------------
+void ofApp::updateVarsFromGui(){
+    
+    for(int i = 0; i < MAX_AVATARS; i++){
+        avatars[i].drawScale = guiScale;
+        avatars[i].pos.x = guiXPos;
+        avatars[i].pos.y= guiYPos;
+    }
 }
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
@@ -353,7 +412,8 @@ void ofApp::mouseDragged(int x, int y, int button){
 
 //--------------------------------------------------------------
 void ofApp::mousePressed(int x, int y, int button){
-
+    //bHasUser = true;
+    //lastUserTime = ofGetElapsedTimef();
 }
 
 //--------------------------------------------------------------
@@ -363,7 +423,9 @@ void ofApp::mouseReleased(int x, int y, int button){
 
 //--------------------------------------------------------------
 void ofApp::windowResized(int w, int h){
-
+    for(int i = 0; i < MAX_AVATARS; i++){
+        avatars[i].pos.set(ofGetWidth()*.5,ofGetHeight()*.5);
+    }
 }
 
 //--------------------------------------------------------------

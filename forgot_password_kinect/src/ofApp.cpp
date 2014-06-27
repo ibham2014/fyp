@@ -37,6 +37,7 @@ void ofApp::setup(){
     bSavingRecords = false;
     avatarOffX = ofGetWidth()*.5+200;
     avatarOffY = 0;
+    blackThreshold = 10;
     
     recorder.setup(640,480);
     recorder.setFormat("jpg");
@@ -416,6 +417,7 @@ void ofApp::setupGui(){
     avatarParameters.add(guiXPos.set("Avatar X Position",ofGetWidth()*.5+200,-1024,1024));
 	avatarParameters.add(guiYPos.set( "Avatar Y Position", 0,-1024, 1024 ));
     avatarParameters.add(guiScale.set( "Avatar Scale", 1,.1, 3 ));
+    avatarParameters.add(guiBlackThreshold.set( "Dark Threshold", 10,0, 100 ));
     
     userCheckParameters.setName("User Presense");
     userCheckParameters.add(guiBoxCenterX.set("User Box X",-500,-2000,2000));
@@ -451,6 +453,9 @@ void ofApp::updateVarsFromGui(){
             float yp = (i+1) * (ofGetHeight()/4.0);
             avatars[i].pos.y= yp+avatarOffY;
         }
+    }else if(blackThreshold != guiBlackThreshold){
+        blackThreshold = guiBlackThreshold;
+        for(int i = 0; i < MAX_AVATARS; i++) avatars[i].imageLoader.blackThreshold = guiBlackThreshold;
     }
 }
 //--------------------------------------------------------------

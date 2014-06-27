@@ -124,6 +124,7 @@ class ofApp : public ofBaseApp{
         ofParameter<int> guiXPos;
         ofParameter<int> guiYPos;
         ofParameter<float> guiScale;
+        ofParameter<int> guiBlackThreshold;
         ofParameter<int> guiNearThreshold;
         ofParameter<int> guiFarThreshold;
         ofParameter<int> guiBoxCenterX;
@@ -134,6 +135,8 @@ class ofApp : public ofBaseApp{
         ofParameter<int> guiBoxDepth;
         ofParameter<int> guiPresenceThreshold;
         ofParameter<bool> guiUseCheckUser;
+    
+        int blackThreshold;
     
         //ofxToggle    guiFullScreen;
         //ofxToggle    guiShowBox;

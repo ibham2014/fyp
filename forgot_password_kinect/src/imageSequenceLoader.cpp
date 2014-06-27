@@ -9,7 +9,7 @@
 #include "imageSequenceLoader.h"
 
 imageSequenceLoader::imageSequenceLoader(){
-    
+    blackThreshold = 10;
 }
 
 void imageSequenceLoader::reset(){
@@ -68,7 +68,7 @@ void imageSequenceLoader::update(){
             
             for(int i = 0; i < 640*480; i++){
                 
-                if(pix[i*3]<20){
+                if(pix[i*3]<blackThreshold){
                     alphaPixels[i*4] = 0;
                     alphaPixels[i*4+1] = 0;
                     alphaPixels[i*4+2] = 0;

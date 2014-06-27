@@ -41,6 +41,8 @@ class ofApp : public ofBaseApp{
         void sendStopRecord();
         void sendClearUser();
         void setupGui();
+        void updateVarsFromGui();
+        void getOscData();
     
         Avatar avatar;
         vector<string> avatarDirectories;
@@ -55,9 +57,17 @@ class ofApp : public ofBaseApp{
         bool bReadyToStart; // is ready to begin insrtuctions
         bool bUseSets;
         bool bRecording;
+        bool bHasUser;
+        float lastUserTime;
+        float userTimeThreshold;
     
         bool bShowGui;
         ofxPanel gui;
+        ofParameterGroup parameters;
+        ofParameterGroup movieParameters;
+        ofParameter<int> guiXPos;
+        ofParameter<int> guiYPos;
+        ofParameter<float> guiScale;
         ofTrueTypeFont font;
     
 

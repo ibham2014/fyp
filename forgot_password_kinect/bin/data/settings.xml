@@ -28,6 +28,7 @@
 			<Avatar_X_Position>712</Avatar_X_Position>
 			<Avatar_Y_Position>0</Avatar_Y_Position>
 			<Avatar_Scale>1</Avatar_Scale>
+		<Dark_Threshold>10</Dark_Threshold>
 		</Avatar_Settings>
 	<User_Presense>
 			<User_Box_X>-500</User_Box_X>
