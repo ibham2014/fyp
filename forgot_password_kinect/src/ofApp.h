@@ -2,10 +2,10 @@
 
 #include "ofMain.h"
 #include "ofxGui.h"
-#include "ofxImageSequencePlayer.h"
 #include "ofxOpenCv.h"
 #include "ofxKinect.h"
 #include "ofxXmlSettings.h"
+#include "ofxOsc.h"
 #include "imageSequenceRecorder.h"
 #include "avatar.h"
 
@@ -59,7 +59,8 @@ class ofApp : public ofBaseApp{
         /** Load an avatar an sequence of images from a directory*/
         void openNextAvatarFromSaved();
     
-    
+        /** Send data via osc */
+        void sendOscData();
     
         
         //----- Kinect ----//
@@ -99,6 +100,9 @@ class ofApp : public ofBaseApp{
         /** Is kinect in use and connected. */
         bool bUseKinect;
     
+        ofxOscSender oscSender;
+        string oscHost;
+        int oscPort;    
     
     
         //----- Gui and Display -----//

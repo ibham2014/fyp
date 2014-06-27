@@ -37,7 +37,7 @@
 			<Use_Presence>1</Use_Presence>
 		<User_Box_Width>800</User_Box_Width>
 			<User_Box_Height>400</User_Box_Height>
-			<User_Pixel_Thresh>1000</User_Pixel_Thresh>
+			<User_Pixel_Thresh>20</User_Pixel_Thresh>
 		</User_Presense>
 	</Settings>
 </group>

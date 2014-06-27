@@ -57,9 +57,12 @@ void ofApp::setup(){
     setupGui();
     bShowGui = true;
     
-    //--------- settings
-    //xml.loadFile("settings.xml");
-
+    //--------- osc settings
+    ofxXmlSettings xml;
+    xml.load("oscSettings.xml");
+    oscHost = xml.getValue("host", "localhost");
+    oscPort = xml.getValue("port", 12345);
+	oscSender.setup(oscHost, oscPort);
 
 }
 //--------------------------------------------------------------
@@ -96,6 +99,9 @@ void ofApp::update(){
             avatars[i].update();
         }
     }
+    
+    //-------- send osc mesages
+    sendOscData();
     
     //-------- update vars not directly connected to gui
     updateVarsFromGui();
@@ -228,8 +234,8 @@ void ofApp::checkForUser(){
             
             bHasDetectedUser = false;
             
-            for( int x = 0; x < w; x++){
-                for( int y = 0; y < h; y++){
+            for( int x = 0; x < w; x+=10){
+                for( int y = 0; y < h; y+=10){
                     
                     ofPoint currentPoint = kinect.getWorldCoordinateAt(x, y);
 
@@ -243,8 +249,7 @@ void ofApp::checkForUser(){
                 }
 
             }
-            
-            
+            cout << "depthPointsInBox detected." << depthPointsInBox << endl;
             if( depthPointsInBox > guiPresenceThreshold){
                 //cout << "User detected." << endl;
                 bHasDetectedUser = true;
@@ -252,6 +257,17 @@ void ofApp::checkForUser(){
         }
             
     }
+    
+}
+
+//--------------------------------------------------------------
+void ofApp::sendOscData(){
+    
+    ofxOscMessage m;
+    m.setAddress("/hasUser");
+    int hasUser = bHasDetectedUser ? 1 : 0;
+    m.addIntArg(hasUser);
+    oscSender.sendMessage(m);
     
 }
 
@@ -296,7 +312,7 @@ void ofApp::draw(){
             "r - toggle recording" << endl << "f - toggle fullscreen" <<  endl << "g - toggle gui " << endl << "s - save settings" << endl
             << "x - clear all avatars" << endl << "recording: " << bRecordingAvatar << endl;
         }else{
-            reportStream << "1,2,3 - Load prerecorded avatars.\n" << "g - toggle this text on/off\n"
+            reportStream << "0 - Load prerecorded avatar.\n" << "g - toggle this text on/off\n"
             << "f - toggle fullscreen\n" <<  "fps: " << ofGetFrameRate() << endl;
         }
             ofDrawBitmapString(reportStream.str(), 10, 450);
@@ -314,7 +330,7 @@ void ofApp::openNextAvatarFromSaved(){
         ofDirectory dirManager;
         dirManager.open(path);
         if( dirManager.isDirectory() ){
-            avatars[totalAvatarsThisUser].setDirectory(openFileResult.getName());
+            avatars[totalAvatarsThisUser].setDirectory(openFileResult.getPath());
             avatars[totalAvatarsThisUser].startAvatar();
             totalAvatarsThisUser++;
         }
@@ -344,7 +360,7 @@ void ofApp::setupGui(){
     userCheckParameters.add(guiBoxWidth.set("User Box Width",800,0,2000));
     userCheckParameters.add(guiBoxHeight.set("User Box Height",400,0,2000));
     userCheckParameters.add(guiBoxDepth.set("User Box Depth",400,0,2000));
-    userCheckParameters.add(guiPresenceThreshold.set("User Pixel Thresh",1000,0,5000));
+    userCheckParameters.add(guiPresenceThreshold.set("User Pixel Thresh",20,0,300));
     userCheckParameters.add(guiUseCheckUser.set("Use Presence",true));
 
     parameters.add(kinectParameters);
@@ -435,28 +451,6 @@ void ofApp::keyPressed(int key){
             totalAvatarsThisUser = 0;
             currentAvatar = -1;
             recorder.q.empty();
-            break;
-       case '1':
-            if(!bUseKinect && totalAvatarsThisUser < MAX_AVATARS){
-                avatars[totalAvatarsThisUser].setDirectory("avatar_2014-06-23-18-36-38-356");
-                avatars[totalAvatarsThisUser].startAvatar();
-                totalAvatarsThisUser++;
-            }
-            break;
-        case '2':
-            if(!bUseKinect && totalAvatarsThisUser < MAX_AVATARS){
-                avatars[totalAvatarsThisUser].setDirectory("avatar_2014-06-23-18-37-35-194");
-                avatars[totalAvatarsThisUser].startAvatar();
-                totalAvatarsThisUser++;
-                
-            }
-            break;
-        case '3':
-            if(!bUseKinect && totalAvatarsThisUser < MAX_AVATARS){
-                avatars[totalAvatarsThisUser].setDirectory("avatar_2014-06-23-18-36-23-113");
-                avatars[totalAvatarsThisUser].startAvatar();
-                totalAvatarsThisUser++;
-            }
             break;
         case '0':
             openNextAvatarFromSaved();
